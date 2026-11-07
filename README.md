@@ -79,21 +79,31 @@ Qt 5.5 的 qmake 不支持 `CONFIG += c++14`，项目在 `.pro` 中直接指定
 
 ## 测试
 
-Core 自测（不依赖 Qt）：
+三个测试各自是**独立工程**（自己的 `.pro`），单独 `qmake` + `make` 就能出可执行
+文件，不依赖主程序，也不依赖预先构建的库。
 
 ```bash
-cd Source/NumberNaze
-g++ -std=c++14 -Wall -Wextra -ICore tests/core_test.cpp \
-    Core/Graph.cpp Core/GameState.cpp -o /tmp/core-test && /tmp/core-test
+# 一次构建并运行全部
+Source/NumberNaze/tests/run_all.sh
 ```
 
-模型自测（覆盖“重开本局”的快照语义）：
+| 工程 | 依赖 | 覆盖 |
+|---|---|---|
+| `core_test` | 无 Qt | 图结构、基本状态、移动与撤销、打乱、可解性 |
+| `restart_test` | 无 Qt | 局面快照与恢复、快照长度不符时明确失败 |
+| `model_test` | QtCore | GameModel 的"重开本局"快照语义 |
+
+单独构建其中一个：
 
 ```bash
-cd Source/NumberNaze/tests
-qmake model-test.pro && make -j$(nproc)
-./build-model/model-test
+mkdir -p build/tests/core && cd build/tests/core
+qmake /路径/Source/NumberNaze/tests/core_test.pro && make -j"$(nproc)"
+./bin/core_test
 ```
+
+产物落在各自的构建目录下（`bin/` 与 `obj/`），不污染源码目录。用 `run_all.sh`
+是为了避开 `TEMPLATE=subdirs`：qmake 的 subdirs 按子目录名拼 `.pro` 路径，而本
+仓库路径里有非 ASCII 目录（`桌面`），生成的 Makefile 会把路径写坏成 `??`。
 
 ## 打包与兼容性
 
