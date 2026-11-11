@@ -42,7 +42,7 @@ ci.xfail
 *.user
 
 # Doxygen 生成的文档
-docs/
+docs/doxygen/
 
 # Python 字节码缓存（工具链用 Python 写成）
 .pytest_cache/
@@ -54,3 +54,7 @@ packaging/stage/
 
 # 模型测试构建目录
 build-model/
+
+# cpp-audit / cxx_ci 产物
+reports/
+ci-logs/

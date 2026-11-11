@@ -3,9 +3,9 @@
 一款基于**特殊图连接拓扑**的数字滑块游戏。把 1 到 15 的数字重新排回顺序、
 空格归位右下角即可通关。
 
-本目录是原 Qt 6 项目的 **Qt 5 移植版**，保留同一套 Core 与 MVC 分层，
-改用 qmake 构建，并把运行库随发行包一起携带，目标是在
-**Ubuntu 16.04 ~ 26.04** 上都能直接运行。
+项目使用 **Qt 5 + C++14**，保持 Qt 5.5 构建兼容性，同时采用与 `life_game`
+相同的分层 MVC、显式模块清单、cxx_ci/cxx_pkg 管理和检查门禁。
+发行包由 cxx_pkg 收集 Qt 运行库，目标是在 **Ubuntu 16.04 ~ 26.04** 上运行。
 
 ## 与普通数字华容道的区别
 
@@ -45,23 +45,33 @@
 
 ## 架构
 
-严格 MVC 分层，依赖方向单向向下，View 与 Model 互不相识：
+采用分层 MVC + 被动视图，依赖方向单向向下，View 与 Model 互不相识：
 
 ```
-MainWindow（组合根）
-   ├── BoardView（V：只绘制、只发信号）
-   ├── GameModel（M：状态、计时、成绩，调用 Core）
-   └── Controller（C：唯一的连接器）
+app::MainWindow（组合根）
+   ├── view::BoardView / StatusBarView / DifficultyCatalog / 对话框
+   ├── model::GameModel（状态、计时、内存内最佳成绩）
+   ├── service::RecordStore（QSettings 持久化）
+   └── controller::GameController（唯一 Model↔View 中介）
 
-core::GameState + core::Graph（纯 C++，无 Qt）
+domain::Graph / GameState / Difficulty（纯 C++14，无 Qt）
 ```
 
-数据流：用户点击 → View 发出 `nodeClicked` → Controller 调用
-Model 的 `requestMove` → Model 委托 Core 执行并广播 `boardChanged` →
-Controller 取出局面数据喂给 View → View 重绘。
+- **Domain**：图拓扑、移动/撤销/打乱、快照校验；无 Qt、无中文展示文案。
+- **Model**：只依赖 Domain/QtCore，不读写文件、不持有 View。
+- **Service**：唯一接触 QSettings 的层，负责最佳成绩。
+- **View**：`BoardView::applyFrame(BoardFrame)` 原子接收棋盘；`StatusBarView`
+  实现 `StatusSink`；只发 `nodeClicked` 意图，不查询 Model。
+- **Controller**：把 View 意图转成 Model 命令，把 Model 状态构造成
+  `BoardFrame`/`StatusState` 推给 View；通过端口显示状态和通关弹窗。
+- **App**：只组合对象和连接菜单；首局由 Controller 的 `initialize()` 启动。
 
-Core 是纯 C++：`Graph`、`GameState`、`Difficulty` 不包含任何 Qt 头文件，
-可脱离 Qt 单独编译和测试。
+数据流：用户点击 → `BoardView::nodeClicked` → `GameController` →
+`GameModel::requestMove` → `domain::GameState` → Model 信号 →
+Controller 构造帧 → View 重绘。
+
+详细设计见 [docs/architecture.md](docs/architecture.md)，复审记录见
+[docs/architecture-audit.md](docs/architecture-audit.md)。
 
 ## 构建
 
@@ -69,82 +79,101 @@ Core 是纯 C++：`Graph`、`GameState`、`Difficulty` 不包含任何 Qt 头文
 
 ```bash
 sudo apt-get install -y qtbase5-dev qt5-qmake g++ make
-qmake number-maze.pro
-make -j$(nproc)
-./build/number-maze
+mkdir -p build/app && cd build/app
+qmake ../../number-maze.pro && make -j6
+./bin/number-maze
 ```
 
-Qt 5.5 的 qmake 不支持 `CONFIG += c++14`，项目在 `.pro` 中直接指定
-`-std=c++14`，因此 g++ 5.4 也能编译。
+本机 qmake 可能被 Qt 6 占用；需要显式使用 Qt 5 时：
+
+```bash
+/usr/lib/qt5/bin/qmake ../../number-maze.pro && make -j6
+```
+
+Qt 5.5 的 qmake 不支持 `CONFIG += c++14`，`number-maze.pri` 直接指定
+`-std=c++14`，因此 g++ 5.4 也能编译。产物落在构建目录的 `bin/`，源码目录保持干净。
+
+### cxx_ci
+
+```bash
+python3 ../cxx_ci/ci/ci.py -c ci.toml
+```
+
+流水线执行 clean → configure → build → 5 个测试工程，固定 6 路并行。
 
 ## 测试
 
-三个测试各自是**独立工程**（自己的 `.pro`），单独 `qmake` + `make` 就能出可执行
-文件，不依赖主程序，也不依赖预先构建的库。
+五个测试各自是独立 qmake 工程，不依赖主程序，也不依赖预先构建的库：
 
 ```bash
-# 一次构建并运行全部
-Source/NumberNaze/tests/run_all.sh
+QMAKE=/usr/lib/qt5/bin/qmake ./tests/run_all.sh
+QMAKE=/usr/lib/qt5/bin/qmake ./tests/run_all.sh model   # 只跑名字含 model 的
 ```
 
 | 工程 | 依赖 | 覆盖 |
 |---|---|---|
-| `core_test` | 无 Qt | 图结构、基本状态、移动与撤销、打乱、可解性 |
-| `restart_test` | 无 Qt | 局面快照与恢复、快照长度不符时明确失败 |
-| `model_test` | QtCore | GameModel 的"重开本局"快照语义 |
+| `domain_tests` | 无 Qt | 图结构、移动/撤销、打乱、可解性 |
+| `restart_tests` | 无 Qt | 局面快照恢复、非法快照拒绝 |
+| `model_tests` | QtCore | 重开本局、难度切换、状态 |
+| `service_tests` | QtCore | 最佳成绩持久化 |
+| `controller_tests` | QtWidgets/QtTest | Model→View 推送、状态栏、悔棋、重开、记录加载 |
 
-单独构建其中一个：
+产物落在 `build/tests/<name>/bin/`，不污染源码目录。`run_all.sh` 默认 6 路并行，
+测试界面时导出 `QT_QPA_PLATFORM=offscreen`，无需 Xvfb。
 
-```bash
-mkdir -p build/tests/core && cd build/tests/core
-qmake /路径/Source/NumberNaze/tests/core_test.pro && make -j"$(nproc)"
-./bin/core_test
-```
-
-产物落在各自的构建目录下（`bin/` 与 `obj/`），不污染源码目录。用 `run_all.sh`
-是为了避开 `TEMPLATE=subdirs`：qmake 的 subdirs 按子目录名拼 `.pro` 路径，而本
-仓库路径里有非 ASCII 目录（`桌面`），生成的 Makefile 会把路径写坏成 `??`。
-
-## 打包与兼容性
-
-在 Ubuntu 16.04（Qt 5.5.1 / glibc 2.23）上构建并打包：
+### 架构门禁
 
 ```bash
-qmake number-maze.pro && make -j$(nproc)
-packaging/make-run.sh 1.0.0
-# 产物：dist/NumberMaze-1.0.0-qt5-x86_64.run
+python3 tools/check_layering.py .
+python3 tools/layering_selftest.py .
 ```
 
-安装包是自解压 shell 脚本，默认装到 `~/.local`，不需要 root，也不需要
-目标机安装 Qt：
+检查 include 方向、Qt/中文污染、`number-maze.pri` 清单完整性和模块分组错位；
+selftest 用负向 fixture 证明门禁会失败。
+
+## 打包（cxx_pkg）
+
+打包配置在 `cxx_pkg.ini`，由 cxx_pkg 完成构建、运行时依赖收集、Qt 插件部署、
+RPATH 改写和包输出：
 
 ```bash
-./NumberMaze-1.0.0-qt5-x86_64.run
-~/.local/bin/number-maze
-
-./NumberMaze-1.0.0-qt5-x86_64.run --prefix /opt/number-maze
-./NumberMaze-1.0.0-qt5-x86_64.run --uninstall
+python3 ../cxx_pkg/cxx_pkg.py --config cxx_pkg.ini
+# 产物：dist/number-maze-2.0.0-aarch64.tar.gz
+#       dist/number-maze-2.0.0-aarch64.run
 ```
 
-包内自带：
+本地 Qt 5 的路径由配置显式指定：
 
-- Qt 5.5 的 Core / Gui / Widgets / DBus / XcbQpa
-- xcb 平台插件（含 offscreen，便于无显示自检）
-- 新版 Ubuntu 已移除的 `libicu*.so.55`、`libpng12`、`libpcre16`、`libpcre`
-- xcb 扩展库
-- 界面所需的 Noto Sans CJK SC 子集字体（约 300 KB）
+```ini
+[build]
+qmake = /usr/lib/qt5/bin/qmake
+make_args = -j6
 
-**为什么在 16.04 上构建**：二进制以 glibc 2.23 为基线，较新的 Ubuntu
-可以运行旧二进制，反之不行。Qt 运行库随包携带，系统侧只依赖 X11、GL、
-fontconfig、freetype、xkbcommon 等各代 Ubuntu 都有的基础库。
+[qt]
+enabled = true
+prefix = /usr
+```
 
-已在以下环境实际验证：
+包内会自动带上：
 
-| 环境 | 方式 | 结果 |
-|---|---|---|
-| Ubuntu 16.04.7（Qt 5.5.1） | 源码构建 + 安装包 xcb 运行 | 通过 |
-| Ubuntu 26.04（XWayland / X11） | 安装包 xcb 运行 | 通过 |
-| Ubuntu 16.04 / 26.04 | 安装包 offscreen 启动 | 通过 |
+- Qt5 Core / Gui / Widgets / DBus / XcbQpa 等实际依赖
+- `libqxcb.so`、`libqoffscreen.so`、`libqminimal.so` 平台插件
+- 依赖的 X11/GL/fontconfig 等运行库（由 `ldd` 递归收集）
+- 可执行文件旁的 `qt.conf` 和相对 RPATH
+
+非 root 验证 `.run`：
+
+```bash
+DESTDIR=/tmp/number-maze-root ./dist/number-maze-2.0.0-aarch64.run
+/tmp/number-maze-root/opt/number-maze/number-maze
+```
+
+**兼容性基线**：包内的 glibc 基线由构建机决定。要在 Ubuntu 16.04 上运行，
+应在 16.04（Qt 5.5.1）环境执行同一份 `cxx_pkg.ini` 完成构建与打包；
+在较新 Ubuntu 上构建的二进制不能保证回退到 16.04。
+
+`.run` 是 cxx_pkg 生成的自解压脚本，支持 `DESTDIR` 安装；
+卸载时删除安装前缀下的 `number-maze` 目录即可。
 
 ## Qt 5 适配要点
 
@@ -154,27 +183,35 @@ fontconfig、freetype、xkbcommon 等各代 Ubuntu 都有的基础库。
   `width()`。
 - 固定使用 Fusion 风格，不依赖各发行版的 gtk 主题插件。
 - 内置一份中文字体子集，目标机缺少 CJK 字体时也不会出现方框。
-- 修复了原模型中“重开本局”快照从未赋值的问题，重开现在会真正回到本局
-  开局局面（新增 `tests/model_test.cpp` 覆盖）。
+- “重开本局”使用本局开局快照复位，并由 `tests/model_tests.cpp` 覆盖。
 
 ## 单实例与日志
 
-`main.cpp` 使用嵌入式 singleproc 库保证同一用户只运行一个实例；重复启动
-时把已有窗口带到前台。日志由 stacklog 写入
-`$XDG_STATE_HOME/number-maze/number-maze.log`
-（未设该变量时为 `~/.local/state/number-maze/number-maze.log`）。
+`main.cpp` 使用嵌入式 singleproc 库保证同一用户只运行一个实例；当前
+singleproc 只提供锁，不提供窗口前置门铃，重复启动会直接退出。日志由
+stacklog 写入 `$XDG_STATE_HOME/number-maze/number-maze.log`
+（未设该变量时为 `~/.local/state/number-maze/number-maze.log`），
+文件按 2 MiB × 3 份轮转。
 
 ## 目录
 
 ```
-number-maze.pro             qmake 工程
-Source/NumberNaze/
-  main.cpp                  入口：字体、风格、日志、单实例、主窗口
-  Core/                     纯 C++：图拓扑、局面与规则
-  MVC/                      MainWindow / Model / View / Controller
-  tests/                    core_test.cpp、model_test.cpp 与 .pro
-Source/singleproc/          外来库：单实例守卫
-Source/stacklog/            外来库：调用链日志
+number-maze.pro             qmake 主工程
+number-maze.pri             分层模块源文件清单
+src/
+  domain/                   纯 C++14：Graph / GameState / Difficulty
+  model/                    GameModel：状态、计时、内存内成绩
+  service/                  RecordStore：QSettings 持久化
+  view/                     BoardView / StatusBarView / 文案与对话框
+  controller/               GameController：唯一 Model↔View 中介
+  app/                      main + MainWindow 组合根
+tests/                      5 个独立 qmake 测试工程与 run_all.sh
+tools/                      check_layering.py + 负向 selftest
+docs/                       architecture.md / architecture-audit.md
+third_party/singleproc/     内嵌库：单实例守卫
+third_party/stacklog/       内嵌库：调用链日志
 resources/                  内置字体子集、图标与 qrc
-packaging/                  自解压安装包脚本与桌面项模板
+audit.toml                  cpp-audit 配置
+ci.toml                     cxx_ci 配置
+cxx_pkg.ini                 cxx_pkg 打包配置
 ```

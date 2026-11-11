@@ -1,0 +1,87 @@
+# cpp-audit 配置 —— number-maze
+#
+# 用法（仓库根目录）：
+#     PYTHONPATH=../cpp-audit/src python3 -m cpp_audit -c audit.toml all
+
+[project]
+name = "number-maze"
+root = "."
+sources = ["src"]
+excludes = ["build", ".git", "Source"]
+build_system = "qmake"
+project_file = "number-maze.pro"
+build_dir = "build/audit"
+target = "number-maze"
+qmake = "/usr/lib/qt5/bin/qmake"
+
+[compat]
+# C++14 + Qt5 项目；compat 的规则集面向 C++98，会产生系统性误报。
+enabled = false
+rules = []
+
+[tidy]
+enabled = true
+checks = ["clang-analyzer-*", "bugprone-*", "cert-*", "portability-*", "performance-*",
+          "-bugprone-easily-swappable-parameters", "-performance-enum-size"]
+header_filter = ".*/src/.*"
+report = "reports/clang-tidy.txt"
+fail_on_warnings = true
+jobs = 6
+
+[cpd]
+enabled = true
+dirs = ["src"]
+min_tokens = 70
+report = "reports/cpd.txt"
+
+[asan]
+# 当前 PRoot 环境无法运行 ASan；保留 build --kind asan 验证构建。
+enabled = false
+build_dir = "build/asan"
+output = "build/asan/bin/number-maze"
+compiler = "clang++"
+cxxflags = ["-std=c++14", "-fsanitize=address",
+            "-fsanitize-address-use-after-return=always",
+            "-fno-omit-frame-pointer", "-g", "-O0"]
+ldflags = ["-fsanitize=address"]
+checks = ["detect_leaks", "detect_stack_use_after_return"]
+options = { halt_on_error = "0", symbolize = "1" }
+report = "reports/asan.txt"
+timeout_sec = 120
+
+[valgrind]
+enabled = true
+build_dir = "build/debug"
+output = "build/debug/bin/number-maze"
+compiler = "clang++"
+cxxflags = ["-std=c++14", "-g", "-O0"]
+tool = "memcheck"
+checks = ["leaks"]
+extra_args = ["--undef-value-errors=no",
+              "--errors-for-leak-kinds=definite,indirect"]
+report = "reports/valgrind.txt"
+timeout_sec = 300
+
+# GUI 程序没有命令行退出路径：Xvfb + openbox + wmctrl 关闭窗口，
+# 让 Qt 正常退出，LeakSanitizer/Valgrind 才能拿到泄漏汇总。
+[run]
+args = []
+env = { DISPLAY = ":102", QT_QPA_PLATFORM = "xcb" }
+timeout_sec = 120
+warmup_sec = 3
+pre = [
+    "pkill -f '[X]vfb :102' 2>/dev/null || true",
+    "Xvfb :102 -screen 0 1280x1024x24 >/tmp/number-maze-audit-xvfb.log 2>&1 &",
+    "sleep 1",
+    "openbox >/tmp/number-maze-audit-openbox.log 2>&1 &",
+    "sleep 1",
+]
+stop = [
+    "i=0; while [ $i -lt 90 ]; do wid=$(wmctrl -l 2>/dev/null | awk '/数字迷宫 -/{print $1; exit}'); if [ -n \"$wid\" ]; then sleep 2; wmctrl -i -c \"$wid\"; exit 0; fi; sleep 1; i=$((i+1)); done; exit 1",
+]
+post = [
+    "pkill -f '[X]vfb :102' 2>/dev/null || true",
+]
+
+[reports]
+dir = "reports"

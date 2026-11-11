@@ -1,0 +1,26 @@
+name = "number-maze"
+build_system = "qmake"
+source_dir = "."
+project_file = "number-maze.pro"
+build_dir = "build/ci"
+build_args = ["-j6"]
+
+clean_paths = ["build/tests"]
+
+[tools]
+qmake = "/usr/lib/qt5/bin/qmake"
+make = "make"
+
+[output]
+build = "warnings"
+test = "failures"
+dir = "ci-logs"
+
+[test]
+framework = "custom"
+commands = [["sh", "tests/run_all.sh"]]
+
+[test.env]
+QMAKE = "/usr/lib/qt5/bin/qmake"
+QT_QPA_PLATFORM = "offscreen"
+JOBS = "6"

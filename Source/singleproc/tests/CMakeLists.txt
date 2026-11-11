@@ -1,3 +1,0 @@
-add_executable(singleproc_test_guard test_guard.cpp)
-target_link_libraries(singleproc_test_guard PRIVATE singleproc)
-add_test(NAME singleproc_test_guard COMMAND singleproc_test_guard)
