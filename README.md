@@ -131,6 +131,19 @@ python3 tools/layering_selftest.py .
 检查 include 方向、Qt/中文污染、`number-maze.pri` 清单完整性和模块分组错位；
 selftest 用负向 fixture 证明门禁会失败。
 
+### 检查入口
+
+```bash
+./check.sh all     # CI + standardize + audit
+./check.sh ci      # 构建与测试
+./check.sh style   # 主工程 src 的全量 tidy
+./check.sh audit   # clang-tidy + CPD + Valgrind
+```
+
+`standardize` 覆盖主工程 `src`；测试是独立 qmake 工程，不在主工程的
+`compile_commands.json` 中，由 `cxx_ci` 负责构建和运行。禁改区/第三方代码由
+`exclude` 排除，Qt 自身头文件由 `.clang-tidy` 的 `HeaderFilterRegex` 忽略。
+
 ## 打包（cxx_pkg）
 
 打包配置在 `cxx_pkg.ini`，由 cxx_pkg 完成构建、运行时依赖收集、Qt 插件部署、
