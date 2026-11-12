@@ -131,8 +131,8 @@ GameModel 判定新纪录 → solved(moves, seconds, true)
 - 主程序全量加入；测试按覆盖范围加入子集。新增文件必须显式加入清单。
 - 第三方源码 `third_party/singleproc`、`third_party/stacklog` 只由主程序加入，
   测试不依赖它们。
-- 并行上限固定为 6：`tests/run_all.sh` 的 `JOBS=6`、`ci.toml` 的 `-j6`、
-  `audit.toml` 的 `jobs=6`、`cxx_pkg.ini` 的 `make_args=-j6`。
+- 并行上限固定为 4：`tests/run_all.sh` 的 `JOBS=4`、cxx_ci 默认 `--jobs 4`、
+  `audit.toml` 的 `jobs=4`、`cxx_pkg.ini` 的 `make_args=-j4`。
 
 ## 5. 错误与持久化
 

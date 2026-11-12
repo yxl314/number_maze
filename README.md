@@ -80,14 +80,14 @@ Controller 构造帧 → View 重绘。
 ```bash
 sudo apt-get install -y qtbase5-dev qt5-qmake g++ make
 mkdir -p build/app && cd build/app
-qmake ../../number-maze.pro && make -j6
+qmake ../../number-maze.pro && make -j4
 ./bin/number-maze
 ```
 
 本机 qmake 可能被 Qt 6 占用；需要显式使用 Qt 5 时：
 
 ```bash
-/usr/lib/qt5/bin/qmake ../../number-maze.pro && make -j6
+/usr/lib/qt5/bin/qmake ../../number-maze.pro && make -j4
 ```
 
 Qt 5.5 的 qmake 不支持 `CONFIG += c++14`，`number-maze.pri` 直接指定
@@ -147,7 +147,7 @@ python3 ../cxx_pkg/cxx_pkg.py --config cxx_pkg.ini
 ```ini
 [build]
 qmake = /usr/lib/qt5/bin/qmake
-make_args = -j6
+make_args = -j4
 
 [qt]
 enabled = true

@@ -4,7 +4,7 @@
 #     ./tests/run_all.sh            # 全部
 #     ./tests/run_all.sh model      # 只跑名字含 model 的
 #
-# 产物放在 build/tests/；并行上限固定为 6。
+# 产物放在 build/tests/；并行上限固定为 4。
 set -u
 
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -16,7 +16,7 @@ if [ -z "${QMAKE:-}" ]; then
         QMAKE=qmake
     fi
 fi
-JOBS=${JOBS:-6}
+JOBS=${JOBS:-4}
 FILTER=${1:-}
 OUT="$ROOT/build/tests"
 STATUS=0
