@@ -34,7 +34,7 @@
 ```bash
 python3 ../cxx_ci/ci/ci.py -c ci.toml
 python3 ../cxx_pkg/cxx_pkg.py --config cxx_pkg.ini --format tar.gz
-PYTHONPATH=../cpp-audit/src python3 -m cpp_audit -c audit.toml all
+PYTHONPATH=../cxx_audit/src python3 -m cpp_audit -c audit.toml all
 python3 tools/check_layering.py .
 python3 tools/layering_selftest.py .
 ```

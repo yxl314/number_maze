@@ -55,6 +55,6 @@ packaging/stage/
 # 模型测试构建目录
 build-model/
 
-# cpp-audit / cxx_ci 产物
+# cxx_audit / cxx_ci 产物
 reports/
 ci-logs/

@@ -1,7 +1,7 @@
-# cpp-audit 配置 —— number-maze
+# cxx_audit 配置 —— number-maze
 #
 # 用法（仓库根目录）：
-#     PYTHONPATH=../cpp-audit/src python3 -m cpp_audit -c audit.toml all
+#     PYTHONPATH=../cxx_audit/src python3 -m cpp_audit -c audit.toml all
 
 [project]
 name = "number-maze"

@@ -211,7 +211,7 @@ docs/                       architecture.md / architecture-audit.md
 third_party/singleproc/     内嵌库：单实例守卫
 third_party/stacklog/       内嵌库：调用链日志
 resources/                  内置字体子集、图标与 qrc
-audit.toml                  cpp-audit 配置
+audit.toml                  cxx_audit 配置
 ci.toml                     cxx_ci 配置
 cxx_pkg.ini                 cxx_pkg 打包配置
 ```
