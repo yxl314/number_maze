@@ -62,7 +62,10 @@ checks = ["leaks"]
 # 根上，根被报出来就够了；算进间接块只会把被抑制的系统泄漏的子树重复计一遍。
 extra_args = ["--undef-value-errors=no",
               "--errors-for-leak-kinds=definite",
-              "--suppressions=tools/valgrind.supp"]
+              "--suppressions=tools/valgrind.supp",
+              # 默认 12 层会在 GUI 库里就截断，抑制规则按库名匹配时
+              # 看不到关键帧；加深到 24 层才是能用的报告
+              "--num-callers=24"]
 report = "reports/valgrind.txt"
 timeout_sec = 300
 
