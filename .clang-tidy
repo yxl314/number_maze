@@ -2,7 +2,10 @@
 # 只检查本项目 src/ 下的源码和头文件。Qt 自身头文件、系统头文件和
 # third_party 不进入诊断。正则同时允许 ./ 和 ../ 前缀，但不允许
 # src/../third_party 这类借道 src 的路径。
-Checks: '-*,bugprone-*,performance-*,portability-*,cert-*,-bugprone-easily-swappable-parameters,-performance-enum-size'
+# cert-err58-cpp：全局 QColor 的静态初始化被判定为可能抛异常。QColor 构造
+# 不会抛，但静态分析看不出；这一项在 Qt 项目里是成片的噪声，所以关掉，
+# 其余 cert-* 保留。
+Checks: '-*,bugprone-*,performance-*,portability-*,cert-*,-bugprone-easily-swappable-parameters,-performance-enum-size,-cert-err58-cpp'
 HeaderFilterRegex: '^(\./|\.\./)*src/([^.]|\.[^./])'
 SystemHeaders: false
 FormatStyle: file

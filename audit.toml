@@ -24,7 +24,7 @@ enabled = true
 # clang-tidy 检查集由项目根目录 .clang-tidy 提供。
 report = "reports/clang-tidy.txt"
 fail_on_warnings = true
-jobs = 8
+jobs = 24
 
 [cpd]
 enabled = true
@@ -37,7 +37,7 @@ report = "reports/cpd.txt"
 enabled = false
 build_dir = "build/asan"
 output = "build/asan/bin/number-maze"
-compiler = "clang++"
+compiler = "g++"
 cxxflags = ["-std=c++14", "-fsanitize=address",
             "-fsanitize-address-use-after-return=always",
             "-fno-omit-frame-pointer", "-g", "-O0"]
@@ -51,7 +51,7 @@ timeout_sec = 120
 enabled = true
 build_dir = "build/debug"
 output = "build/debug/bin/number-maze"
-compiler = "clang++"
+compiler = "g++"
 cxxflags = ["-std=c++14", "-g", "-O0"]
 tool = "memcheck"
 checks = ["leaks"]
