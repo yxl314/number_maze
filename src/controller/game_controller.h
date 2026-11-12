@@ -109,12 +109,12 @@ private:
     /// @brief 从持久化存储读出各难度最佳步数并写入模型。
     void loadRecords();
 
-    view::BoardView* m_view = nullptr;
-    model::GameModel* m_model = nullptr;
-    view::StatusSink* m_status = nullptr;
-    view::SolvedSink* m_solved = nullptr;
-    service::RecordStore* m_records = nullptr;
-    const view::DifficultyCatalog* m_catalog = nullptr;
+    view::BoardView* m_view = nullptr;  ///< 被动棋盘视图，不持有所有权。
+    model::GameModel* m_model = nullptr;  ///< 游戏模型，不持有所有权。
+    view::StatusSink* m_status = nullptr;  ///< 状态栏输出端口，可为空。
+    view::SolvedSink* m_solved = nullptr;  ///< 通关结果输出端口，可为空。
+    service::RecordStore* m_records = nullptr;  ///< 最佳成绩存储，可为空。
+    const view::DifficultyCatalog* m_catalog = nullptr;  ///< 难度名称表，可为空。
 };
 
 } // namespace controller

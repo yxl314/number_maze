@@ -35,7 +35,7 @@ public:
     void showSolved(const SolvedInfo& info) override;
 
 private:
-    QWidget* m_parent = nullptr;
+    QWidget* m_parent = nullptr;  ///< 消息框的父控件，可为空。
 };
 
 } // namespace view

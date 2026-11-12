@@ -50,12 +50,12 @@ public:
     void setWindowTitle(const QString& title) override;
 
 private:
-    QMainWindow* m_window = nullptr;
-    QLabel* m_difficulty = nullptr;
-    QLabel* m_moves = nullptr;
-    QLabel* m_time = nullptr;
-    QLabel* m_best = nullptr;
-    QAction* m_undo = nullptr;
+    QMainWindow* m_window = nullptr;  ///< 需要更新标题的窗口，可为空。
+    QLabel* m_difficulty = nullptr;  ///< 难度标签，可为空。
+    QLabel* m_moves = nullptr;  ///< 步数标签，可为空。
+    QLabel* m_time = nullptr;  ///< 用时标签，可为空。
+    QLabel* m_best = nullptr;  ///< 最佳成绩标签，可为空。
+    QAction* m_undo = nullptr;  ///< 随悔棋可用状态启停的动作，可为空。
 };
 
 } // namespace view

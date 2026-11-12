@@ -84,20 +84,11 @@ bool setupLogging()
 } // namespace
 
 /**
- * @brief 程序入口。
+ * @brief 按超时自动关闭窗口，仅在设置了 @c CXX_GUI_AUTOCLOSE_MS 时生效。
  *
- * @par 流程
- *  1. 初始化日志；
- *  2. 取单实例锁：已有实例或锁错误时直接结束，不再打开窗口；
- *  3. 取得独占权后创建主窗口并进入事件循环。
- *
- * @note 当前应用暂未接入 singleproc 门铃；重复启动会直接退出，不会把已有
- *       窗口带到前台。
+ * 让无头环境里的 GUI 程序走完整的 @c close → @c quit → 析构链路，以便拿到
+ * 退出时的泄漏汇总；正常启动不受影响。
  */
-// 审计用：GUI 程序没有命令行退出路径，无头环境里只能被杀掉——那样拿不到
-// 正常退出流程产生的泄漏汇总。用定时器让窗口自己关，Qt 走完整的 close →
-// quit → 析构链路。只在显式设置了 CXX_GUI_AUTOCLOSE_MS 时生效，正常启动
-// 不受任何影响。
 static void installAutoClose(QWidget* window)
 {
     const QByteArray raw = qgetenv("CXX_GUI_AUTOCLOSE_MS");
@@ -110,7 +101,17 @@ static void installAutoClose(QWidget* window)
     QTimer::singleShot(milliseconds, window, [window]() { window->close(); });
 }
 
-
+/**
+ * @brief 程序入口：初始化日志、取得单实例锁，然后运行主窗口。
+ *
+ * @par 流程
+ *  1. 初始化日志；
+ *  2. 取单实例锁：已有实例或锁错误时直接结束，不打开窗口；
+ *  3. 取得独占权后创建主窗口并进入事件循环。
+ *
+ * @note 当前应用暂未接入 singleproc 门铃；重复启动会直接退出，不会把已有
+ *       窗口带到前台。
+ */
 int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);

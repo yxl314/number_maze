@@ -53,11 +53,11 @@ private:
     /**
      * @brief 难度在配置键中的下标。
      * @param level 难度等级。
-     * @return 合法等级返回其下标，其余取值返回 0（普通难度）。
+     * @return 合法等级返回其下标；越界取值回落到 @c Easy 的下标 0。
      */
     static int levelIndex(domain::Difficulty level);
 
-    std::unique_ptr<QSettings> m_settings;
+    std::unique_ptr<QSettings> m_settings;  ///< 配置存储；测试中可为空。
 };
 
 } // namespace service

@@ -138,16 +138,15 @@ private:
      *
      * 合法棋盘是 0..g_node_count-1 各出现一次的排列。
      *
-     * @param board 待校验的取值数组。
-     * @param g_node_count 数组长度，取棋盘节点总数的编译期常量，不占运行时实参。
+     * @param board 待校验的取值数组，长度固定为 @c g_node_count。
      */
     static bool isValidBoard(const std::array<int, g_node_count>& board);
 
-    Graph m_graph;
-    std::array<int, g_node_count> m_board{};
-    std::vector<int> m_history;
-    int m_moveCount = 0;
-    Random* m_random = nullptr;
+    Graph m_graph;  ///< 固定拓扑，构造后保持不变。
+    std::array<int, g_node_count> m_board{};  ///< 每个节点的取值；0 表示空格。
+    std::vector<int> m_history;  ///< 悔棋历史；每项记录一次移动前的空格下标。
+    int m_moveCount = 0;  ///< 上一次打乱或恢复以来的玩家步数。
+    Random* m_random = nullptr;  ///< 注入的随机源；为空时使用进程内共享的内置随机源。
 };
 
 } // namespace domain

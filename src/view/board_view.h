@@ -160,13 +160,13 @@ private:
         return m_board.size();
     }
 
-    QVector<int> m_board;
-    QVector<QVector<int>> m_adjacency;
-    QVector<bool> m_movable;
-    bool m_solved = false;
-    int m_solvedMoves = 0;
-    int m_boardSize = 4;
-    int m_hover = -1;
+    QVector<int> m_board;  ///< 当前帧的节点取值；0 表示空格。
+    QVector<QVector<int>> m_adjacency;  ///< 绘制连线用的邻居表。
+    QVector<bool> m_movable;  ///< 每个节点的可移动标记，长度与取值个数一致。
+    bool m_solved = false;  ///< 当前帧是否已完成。
+    int m_solvedMoves = 0;  ///< 完成遮罩中显示的步数。
+    int m_boardSize = 4;  ///< 棋盘边长，由取值个数的平方根向上取整。
+    int m_hover = -1;  ///< 鼠标悬停的节点下标；没有悬停时为 -1。
 };
 
 } // namespace view
