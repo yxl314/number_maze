@@ -87,7 +87,7 @@ qmake ../../number-maze.pro && make -j4
 本机 qmake 可能被 Qt 6 占用；需要显式使用 Qt 5 时：
 
 ```bash
-/usr/lib/qt5/bin/qmake ../../number-maze.pro && make -j4
+qmake5 ../../number-maze.pro && make -j4
 ```
 
 Qt 5.5 的 qmake 不支持 `CONFIG += c++14`，`number-maze.pri` 直接指定
@@ -106,8 +106,8 @@ python3 ../cxx_ci/ci/ci.py -c ci.toml
 五个测试各自是独立 qmake 工程，不依赖主程序，也不依赖预先构建的库：
 
 ```bash
-QMAKE=/usr/lib/qt5/bin/qmake ./tests/run_all.sh
-QMAKE=/usr/lib/qt5/bin/qmake ./tests/run_all.sh model   # 只跑名字含 model 的
+QMAKE=qmake5 ./tests/run_all.sh
+QMAKE=qmake5 ./tests/run_all.sh model   # 只跑名字含 model 的
 ```
 
 | 工程 | 依赖 | 覆盖 |
@@ -146,7 +146,7 @@ python3 ../cxx_pkg/cxx_pkg.py --config cxx_pkg.ini
 
 ```ini
 [build]
-qmake = /usr/lib/qt5/bin/qmake
+qmake = qmake5
 make_args = -j4
 
 [qt]

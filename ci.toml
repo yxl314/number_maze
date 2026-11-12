@@ -7,7 +7,7 @@ build_dir = "build/ci"
 clean_paths = ["build/tests"]
 
 [tools]
-qmake = "/usr/lib/qt5/bin/qmake"
+qmake = "qmake5"
 make = "make"
 
 [output]
@@ -20,5 +20,5 @@ framework = "custom"
 commands = [["sh", "tests/run_all.sh"]]
 
 [test.env]
-QMAKE = "/usr/lib/qt5/bin/qmake"
+QMAKE = "qmake5"
 QT_QPA_PLATFORM = "offscreen"

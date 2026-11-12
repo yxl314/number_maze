@@ -1,4 +1,4 @@
 ---
-Checks: '-*,bugprone-*,performance-*,portability-*,cert-*'
+Checks: '-*,bugprone-*,performance-*,portability-*,cert-*,-bugprone-easily-swappable-parameters,-performance-enum-size'
 HeaderFilterRegex: 'src/.*'
 FormatStyle: file

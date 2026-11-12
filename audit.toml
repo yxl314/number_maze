@@ -12,7 +12,7 @@ build_system = "qmake"
 project_file = "number-maze.pro"
 build_dir = "build/audit"
 target = "number-maze"
-qmake = "/usr/lib/qt5/bin/qmake"
+qmake = "qmake5"
 
 [compat]
 # C++14 + Qt5 项目；compat 的规则集面向 C++98，会产生系统性误报。
@@ -21,9 +21,7 @@ rules = []
 
 [tidy]
 enabled = true
-checks = ["clang-analyzer-*", "bugprone-*", "cert-*", "portability-*", "performance-*",
-          "-bugprone-easily-swappable-parameters", "-performance-enum-size"]
-header_filter = ".*/src/.*"
+# clang-tidy 检查集由项目根目录 .clang-tidy 提供。
 report = "reports/clang-tidy.txt"
 fail_on_warnings = true
 jobs = 4

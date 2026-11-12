@@ -9,13 +9,7 @@ set -u
 
 HERE=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(cd "$HERE/.." && pwd)
-if [ -z "${QMAKE:-}" ]; then
-    if [ -x /usr/lib/qt5/bin/qmake ]; then
-        QMAKE=/usr/lib/qt5/bin/qmake
-    else
-        QMAKE=qmake
-    fi
-fi
+QMAKE=${QMAKE:-qmake5}
 JOBS=${JOBS:-4}
 FILTER=${1:-}
 OUT="$ROOT/build/tests"
