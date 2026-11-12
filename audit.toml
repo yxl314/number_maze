@@ -24,7 +24,7 @@ enabled = true
 # clang-tidy 检查集由项目根目录 .clang-tidy 提供。
 report = "reports/clang-tidy.txt"
 fail_on_warnings = true
-jobs = 4
+jobs = 8
 
 [cpd]
 enabled = true
