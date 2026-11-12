@@ -2,7 +2,7 @@
 
 /**
  * @file difficulty.h
- * @brief Game difficulty levels and their scramble budgets.
+ * @brief 难度等级定义及其打乱步数预算。
  */
 
 #include <cstdint>
@@ -10,10 +10,14 @@
 namespace domain
 {
 
-/// @brief Number of supported difficulty levels.
+/// @brief 支持的难度等级个数。
 constexpr int kDifficultyCount = 4;
 
-/// @brief Game difficulty.
+/**
+ * @brief 游戏难度。
+ *
+ * 取值从 0 起连续排布，可直接作为按难度索引的数组下标。
+ */
 enum class Difficulty : std::uint8_t
 {
     Easy = 0,
@@ -23,9 +27,12 @@ enum class Difficulty : std::uint8_t
 };
 
 /**
- * @brief Scramble steps for one difficulty.
- * @param level Difficulty level.
- * @return Number of legal moves used to scramble.
+ * @brief 一种难度对应的打乱步数。
+ *
+ * 步数按合法移动计数，等级越高数值越大。
+ *
+ * @param level 难度等级。
+ * @return 打乱所用的合法移动步数；未知取值按普通难度的 40 步处理。
  */
 inline int scrambleSteps(Difficulty level)
 {

@@ -2,7 +2,7 @@
 
 /**
  * @file interfaces.h
- * @brief Narrow output ports used by the controller.
+ * @brief 控制器使用的窄输出端口。
  */
 
 #include <QString>
@@ -12,26 +12,37 @@
 namespace view
 {
 
-/// @brief Receives status-bar text and window-title changes.
+/// @brief 接收状态栏文本与窗口标题变化。
 class StatusSink
 {
 public:
+    /// @brief 允许通过端口指针销毁具体实现。
     virtual ~StatusSink() = default;
 
-    /// @param state Complete status-bar state.
+    /**
+     * @brief 应用一份完整的状态栏状态。
+     * @param state 状态栏要显示的难度、步数、用时与最佳成绩。
+     */
     virtual void applyStatus(const StatusState& state) = 0;
 
-    /// @param title Window title.
+    /**
+     * @brief 设置窗口标题。
+     * @param title 新标题。
+     */
     virtual void setWindowTitle(const QString& title) = 0;
 };
 
-/// @brief Receives the solved result presentation.
+/// @brief 接收通关结果的展示请求。
 class SolvedSink
 {
 public:
+    /// @brief 允许通过端口指针销毁具体实现。
     virtual ~SolvedSink() = default;
 
-    /// @param info Solved result.
+    /**
+     * @brief 展示通关结果。
+     * @param info 难度、步数、用时与是否破纪录。
+     */
     virtual void showSolved(const SolvedInfo& info) = 0;
 };
 

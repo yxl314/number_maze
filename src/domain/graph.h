@@ -2,7 +2,7 @@
 
 /**
  * @file graph.h
- * @brief Immutable board topology.
+ * @brief 不可变的棋盘连接拓扑。
  */
 
 #include <array>
@@ -12,69 +12,83 @@
 namespace domain
 {
 
-/// @brief Board side length (4x4).
+/// @brief 棋盘边长（4x4）。
 constexpr int g_board_size = 4;
 
-/// @brief Total node count.
+/// @brief 节点总数。
 constexpr int g_node_count = g_board_size * g_board_size;
 
 /**
- * @brief Board connection topology.
+ * @brief 棋盘连接拓扑。
  *
- * Nodes are arranged as a 4x4 square, but the edges are not grid neighbors:
- * there are 22 edges including diagonal links such as 1-6 and 3-8. The graph
- * only describes connections; it owns no game state.
+ * 节点按 4x4 方阵摆放，但边不是网格相邻关系：全图共 22 条边，其中包含
+ * 1-6、3-8 这类对角连接。该类型只描述连接关系，不持有任何游戏状态。
  */
 class Graph
 {
 public:
-    /// @brief Build the complete topology.
+    /// @brief 构建完整拓扑。
     Graph();
 
     /**
-     * @brief Neighbors of one node.
-     * @param index Node index in [0, g_node_count).
-     * @return Immutable neighbor list; empty for an invalid index.
+     * @brief 取一个节点的邻居。
+     * @param index 节点下标，取值 [0, g_node_count)。
+     * @return 只读邻居列表；下标非法时为空表。
      */
     const std::vector<int>& neighbors(int index) const;
 
     /**
-     * @brief Test whether two nodes share an edge.
-     * @param a First node index.
-     * @param b Second node index.
-     * @return True when directly connected.
+     * @brief 判断两个节点之间是否有边。
+     * @param a 第一个节点下标。
+     * @param b 第二个节点下标。
+     * @return 直接相连时为 true。
      */
     bool areAdjacent(int a, int b) const;
 
     /**
-     * @brief Degree of one node.
-     * @param index Node index.
-     * @return Neighbor count; 0 for an invalid index.
+     * @brief 取一个节点的度。
+     * @param index 节点下标。
+     * @return 邻居个数；下标非法时为 0。
      */
     std::size_t degree(int index) const;
 
-    /// @return Total edge count (22 for the built-in topology).
+    /// @brief 取边总数。
+    /// @return 内置拓扑的边数，等于 22。
     std::size_t edgeCount() const
     {
         return m_edgeCount;
     }
 
-    /// @param index Node index.
-    /// @return Row in [0, 4); -1 for an invalid index.
+    /**
+     * @brief 节点所在行。
+     * @param index 节点下标。
+     * @return 行号，取值 [0, 4)；下标非法时为 -1。
+     */
     static int rowOf(int index);
 
-    /// @param index Node index.
-    /// @return Column in [0, 4); -1 for an invalid index.
+    /**
+     * @brief 节点所在列。
+     * @param index 节点下标。
+     * @return 列号，取值 [0, 4)；下标非法时为 -1。
+     */
     static int colOf(int index);
 
     /**
-     * @brief Value expected at a solved position.
-     * @param index Node index.
-     * @return 1..15 for normal nodes, 0 for the blank, -1 for invalid index.
+     * @brief 已完成局面下某个节点的取值。
+     * @param index 节点下标。
+     * @return 普通节点为 1..15，右下角空格为 0，下标非法时为 -1。
      */
     static int solvedValueAt(int index);
 
 private:
+    /**
+     * @brief 添加一条无向边。
+     *
+     * 端点以 1 起始编号传入；越界、自环和重复边都被忽略。
+     *
+     * @param a 第一个端点编号，取值 [1, g_node_count]。
+     * @param b 第二个端点编号，取值 [1, g_node_count]。
+     */
     void addEdge(int a, int b);
 
     std::array<std::vector<int>, g_node_count> m_adjacency;

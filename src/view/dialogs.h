@@ -2,7 +2,7 @@
 
 /**
  * @file dialogs.h
- * @brief Localized message-box presentation helpers.
+ * @brief 本地化的消息框展示辅助。
  */
 
 #include "view/interfaces.h"
@@ -12,17 +12,26 @@ class QWidget;
 namespace view
 {
 
-/// @brief Show the application about box.
-/// @param parent Dialog parent.
+/**
+ * @brief 显示“关于”对话框。
+ * @param parent 对话框父控件。
+ */
 void showAbout(QWidget* parent);
 
-/// @brief QMessageBox-backed implementation of SolvedSink.
+/// @brief 基于 QMessageBox 的 SolvedSink 实现。
 class MessageBoxSolvedSink : public SolvedSink
 {
 public:
-    /// @param parent Dialog parent.
+    /**
+     * @brief 保存消息框的父控件。
+     * @param parent 消息框父控件。
+     */
     explicit MessageBoxSolvedSink(QWidget* parent = nullptr);
 
+    /**
+     * @brief 弹出通关结果。
+     * @param info 难度、步数、用时与是否破纪录。
+     */
     void showSolved(const SolvedInfo& info) override;
 
 private:
