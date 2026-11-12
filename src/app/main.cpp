@@ -12,7 +12,7 @@
 #include <QStringList>
 
 #include <singleproc/singleproc.hpp>
-#include <stacklog/stacklog.h>
+#include <stacklog/stacklog.hpp>
 
 #include "app/main_window.h"
 
@@ -70,12 +70,12 @@ QString stateLogDirectory()
  */
 bool setupLogging()
 {
-    stacklog::Config config;
+    stacklog::config config;
     config.dir = stateLogDirectory().toStdString();
     config.base_name = g_application_name;
     config.max_file_size = 2ULL * 1024 * 1024;
     config.max_files = 3;
-    config.level = stacklog::Level::Info;
+    config.min_level = stacklog::level::info;
     return stacklog::init(config);
 }
 

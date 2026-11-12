@@ -60,8 +60,8 @@ NUMBERMAZE_MAIN_SOURCES = \
 # 第三方源码保持独立；域层和测试不依赖它们。
 NUMBERMAZE_THIRD_PARTY_HEADERS = \
     $$NUMBERMAZE_ROOT/third_party/singleproc/include/singleproc/singleproc.hpp \
-    $$NUMBERMAZE_ROOT/third_party/stacklog/include/stacklog/stacklog.h \
-    $$NUMBERMAZE_ROOT/third_party/stacklog/include/stacklog/version.h
+    $$NUMBERMAZE_ROOT/third_party/stacklog/include/stacklog/stacklog.hpp \
+    $$NUMBERMAZE_ROOT/third_party/stacklog/include/stacklog/version.hpp
 
 NUMBERMAZE_THIRD_PARTY_SOURCES = \
     $$NUMBERMAZE_ROOT/third_party/singleproc/src/singleproc.cpp \
