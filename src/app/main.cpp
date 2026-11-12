@@ -89,8 +89,8 @@ bool setupLogging()
  *  2. 取单实例锁：已有实例或锁错误时直接结束，不再打开窗口；
  *  3. 取得独占权后创建主窗口并进入事件循环。
  *
- * @note 当前 singleproc 只提供单实例锁，不提供把已有窗口带到前台的门铃；
- *       重复启动会直接退出。
+ * @note 当前应用暂未接入 singleproc 门铃；重复启动会直接退出，不会把已有
+ *       窗口带到前台。
  */
 int main(int argc, char* argv[])
 {
@@ -119,10 +119,10 @@ int main(int argc, char* argv[])
         singleproc::Guard guard(g_instance_name);
         if (guard.state() == singleproc::Guard::State::Error)
         {
-            STACKLOG_ERROR() << "单实例锁失败 errno=" << guard.errorCode();
+            STACKLOG_ERROR() << "单实例锁失败 errno=" << guard.error_code();
             exitCode = 1;
         }
-        else if (!guard.isPrimary())
+        else if (!guard.is_primary())
         {
             STACKLOG_INFO() << "已有实例在运行，本次启动不再打开窗口";
             exitCode = 0;

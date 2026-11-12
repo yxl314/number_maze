@@ -188,7 +188,7 @@ DESTDIR=/tmp/number-maze-root ./dist/number-maze-2.0.0-aarch64.run
 ## 单实例与日志
 
 `main.cpp` 使用嵌入式 singleproc 库保证同一用户只运行一个实例；当前
-singleproc 只提供锁，不提供窗口前置门铃，重复启动会直接退出。日志由
+应用暂未接入门铃，重复启动会直接退出。日志由
 stacklog 写入 `$XDG_STATE_HOME/number-maze/number-maze.log`
 （未设该变量时为 `~/.local/state/number-maze/number-maze.log`），
 文件按 2 MiB × 3 份轮转。
