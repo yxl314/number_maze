@@ -55,28 +55,33 @@ compiler = "g++"
 cxxflags = ["-std=c++14", "-g", "-O0"]
 tool = "memcheck"
 checks = ["leaks"]
+# --suppressions：libfontconfig 退出时不释放字体缓存、libdbus 的连接在 Qt
+# 拆事件循环后没有收尾，两者都会以 "definitely lost" 出现；那是系统侧的行为，
+# 照实报只会淹掉真正的泄漏。
+# --errors-for-leak-kinds=definite：只按"根块丢失"计错。间接丢失必然挂在某个
+# 根上，根被报出来就够了；算进间接块只会把被抑制的系统泄漏的子树重复计一遍。
 extra_args = ["--undef-value-errors=no",
-              "--errors-for-leak-kinds=definite,indirect"]
+              "--errors-for-leak-kinds=definite",
+              "--suppressions=tools/valgrind.supp"]
 report = "reports/valgrind.txt"
 timeout_sec = 300
 
-# GUI 程序没有命令行退出路径：Xvfb + openbox + wmctrl 关闭窗口，
+# GUI 程序没有命令行退出路径：Xvfb + openbox + xdotool 关闭窗口，
 # 让 Qt 正常退出，LeakSanitizer/Valgrind 才能拿到泄漏汇总。
 [run]
 args = []
-env = { DISPLAY = ":102", QT_QPA_PLATFORM = "xcb" }
+env = { DISPLAY = ":102", QT_QPA_PLATFORM = "xcb", CXX_GUI_AUTOCLOSE_MS = "8000" }
 timeout_sec = 120
 warmup_sec = 3
 pre = [
+    "pkill -f '[b]uild/debug/bin/number-maze' 2>/dev/null || true",
     "pkill -f '[X]vfb :102' 2>/dev/null || true",
     "Xvfb :102 -screen 0 1280x1024x24 >/tmp/number-maze-audit-xvfb.log 2>&1 &",
     "sleep 1",
     "openbox >/tmp/number-maze-audit-openbox.log 2>&1 &",
     "sleep 1",
 ]
-stop = [
-    "i=0; while [ $i -lt 90 ]; do wid=$(wmctrl -l 2>/dev/null | awk '/数字迷宫 -/{print $1; exit}'); if [ -n \"$wid\" ]; then sleep 2; wmctrl -i -c \"$wid\"; exit 0; fi; sleep 1; i=$((i+1)); done; exit 1",
-]
+stop = []
 post = [
     "pkill -f '[X]vfb :102' 2>/dev/null || true",
 ]

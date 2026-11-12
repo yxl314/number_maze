@@ -10,6 +10,8 @@
 #include <QIcon>
 #include <QString>
 #include <QStringList>
+#include <QTimer>
+#include <QWidget>
 
 #include <singleproc/singleproc.hpp>
 #include <stacklog/stacklog.hpp>
@@ -92,6 +94,23 @@ bool setupLogging()
  * @note 当前应用暂未接入 singleproc 门铃；重复启动会直接退出，不会把已有
  *       窗口带到前台。
  */
+// 审计用：GUI 程序没有命令行退出路径，无头环境里只能被杀掉——那样拿不到
+// 正常退出流程产生的泄漏汇总。用定时器让窗口自己关，Qt 走完整的 close →
+// quit → 析构链路。只在显式设置了 CXX_GUI_AUTOCLOSE_MS 时生效，正常启动
+// 不受任何影响。
+static void installAutoClose(QWidget* window)
+{
+    const QByteArray raw = qgetenv("CXX_GUI_AUTOCLOSE_MS");
+    bool ok = false;
+    const int milliseconds = raw.toInt(&ok);
+    if (!ok || milliseconds <= 0)
+    {
+        return;
+    }
+    QTimer::singleShot(milliseconds, window, [window]() { window->close(); });
+}
+
+
 int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
@@ -131,6 +150,7 @@ int main(int argc, char* argv[])
         {
             app::MainWindow window;
             window.show();
+            installAutoClose(&window);
             exitCode = QApplication::exec();
             STACKLOG_INFO() << "数字迷宫退出 code=" << exitCode;
         }
