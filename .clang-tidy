@@ -5,7 +5,7 @@
 # cert-err58-cpp：全局 QColor 的静态初始化被判定为可能抛异常。QColor 构造
 # 不会抛，但静态分析看不出；这一项在 Qt 项目里是成片的噪声，所以关掉，
 # 其余 cert-* 保留。
-Checks: '-*,bugprone-*,performance-*,portability-*,cert-*,-bugprone-easily-swappable-parameters,-performance-enum-size,-cert-err58-cpp'
+Checks: '-*,bugprone-*,performance-*,portability-*,cert-*,-bugprone-easily-swappable-parameters,-performance-enum-size,-cert-err58-cpp,-portability-avoid-pragma-once'
 HeaderFilterRegex: '^(\./|\.\./)*src/([^.]|\.[^./])'
 SystemHeaders: false
 FormatStyle: file

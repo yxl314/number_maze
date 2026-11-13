@@ -6,7 +6,6 @@
  */
 
 #include <QObject>
-#include <QTime>
 #include <QVector>
 
 #include <array>
@@ -30,7 +29,7 @@ class GameModel : public QObject
 {
     Q_OBJECT
 
-public:
+  public:
     /**
      * @brief 构造模型并准备好一秒一跳的计时器。
      * @param parent Qt 对象树的父对象。
@@ -58,13 +57,6 @@ public:
         return m_elapsedSeconds;
     }
 
-    /// @brief 取已用时长。
-    /// @return 供界面按 hh:mm:ss 格式化的 QTime。
-    QTime elapsed() const
-    {
-        return QTime(0, 0).addSecs(m_elapsedSeconds);
-    }
-
     /// @brief 是否还有可撤销的移动。
     /// @return 存在悔棋历史时为 true。
     bool canUndo() const
@@ -85,13 +77,6 @@ public:
      * @return 最佳步数；没有纪录时为 0。
      */
     int bestRecord(domain::Difficulty level) const;
-
-    /// @brief 取全部最佳步数。
-    /// @return 按难度索引的内存纪录数组。
-    const std::array<int, domain::kDifficultyCount>& bestRecords() const
-    {
-        return m_bestRecords;
-    }
 
     /**
      * @brief 整体写入内存中的最佳步数。
@@ -114,16 +99,13 @@ public:
     /// @return 每个节点一项，表示该节点当前能否移入空格。
     QVector<bool> movableData() const;
 
-public slots:
+  public slots:
     /**
      * @brief 按指定难度开始新的一局。
      * @param level 难度等级。
      * @note 会重置计时与完成标记，并把打乱后的局面保存为本局的初始局面。
      */
     void startNewGame(domain::Difficulty level);
-
-    /// @brief 按当前难度重新开始一局。
-    void startNewGame();
 
     /**
      * @brief 把当前一局恢复到初始局面，并清零计时与步数。
@@ -141,7 +123,7 @@ public slots:
     /// @brief 撤销最近一次移动。
     void requestUndo();
 
-signals:
+  signals:
     /// @brief 棋盘取值或可移动状态发生变化。
     void boardChanged();
 
@@ -159,11 +141,11 @@ signals:
      */
     void solved(int moves, int seconds, bool isNewRecord);
 
-private slots:
+  private slots:
     /// @brief 计时器每次超时：累加用时并通知界面。
     void onTick();
 
-private:
+  private:
     /// @brief 启动一秒一跳的计时器；已在运行时不重复启动。
     void startTimer();
 
@@ -177,14 +159,14 @@ private:
      */
     int levelIndex(domain::Difficulty level) const;
 
-    domain::GameState m_state;  ///< 棋盘状态、悔棋历史与步数。
-    std::vector<int> m_initialBoard;  ///< 本局开始时的棋盘快照，供重开恢复。
-    domain::Difficulty m_difficulty = domain::Difficulty::Normal;  ///< 本局选定的难度。
-    QTimer* m_timer = nullptr;  ///< 一秒一跳的计时器，由 Qt 对象树持有。
-    int m_elapsedSeconds = 0;  ///< 本局累计用时（秒）。
-    bool m_running = false;  ///< 计时器当前是否在运行。
-    bool m_solvedNotified = false;  ///< 是否已发出通关信号，用于忽略完成后的移动。
-    std::array<int, domain::kDifficultyCount> m_bestRecords{};  ///< 按难度索引的最佳步数；0 表示没有纪录。
+    domain::GameState m_state;                                    ///< 棋盘状态、悔棋历史与步数。
+    std::vector<int> m_initialBoard;                              ///< 本局开始时的棋盘快照，供重开恢复。
+    domain::Difficulty m_difficulty = domain::Difficulty::Normal; ///< 本局选定的难度。
+    QTimer* m_timer = nullptr;                                    ///< 一秒一跳的计时器，由 Qt 对象树持有。
+    int m_elapsedSeconds = 0;                                     ///< 本局累计用时（秒）。
+    bool m_running = false;                                       ///< 计时器当前是否在运行。
+    bool m_solvedNotified = false;                                ///< 是否已发出通关信号，用于忽略完成后的移动。
+    std::array<int, domain::kDifficultyCount> m_bestRecords{};    ///< 按难度索引的最佳步数；0 表示没有纪录。
 };
 
 } // namespace model

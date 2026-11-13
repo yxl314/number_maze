@@ -17,7 +17,7 @@ namespace view
 /// @brief 难度名称表；领域层不携带任何展示文本。
 class DifficultyCatalog
 {
-public:
+  public:
     /// @brief 全部难度。
     /// @return 按菜单顺序排列的难度数组。
     const std::array<domain::Difficulty, domain::kDifficultyCount>& all() const;

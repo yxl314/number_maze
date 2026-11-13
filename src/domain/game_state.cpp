@@ -11,7 +11,7 @@ namespace
 
 class DefaultRandom : public GameState::Random
 {
-public:
+  public:
     int next(int bound) override
     {
         if (bound <= 0)
@@ -22,20 +22,18 @@ public:
         return distribution(m_engine);
     }
 
-private:
+  private:
     std::mt19937 m_engine{std::random_device{}()};
 };
 
 } // namespace
 
-GameState::GameState()
-    : m_random(nullptr)
+GameState::GameState() : m_random(nullptr)
 {
     reset();
 }
 
-GameState::GameState(Random* random)
-    : m_random(random)
+GameState::GameState(Random* random) : m_random(random)
 {
     reset();
 }
@@ -110,10 +108,8 @@ void GameState::scramble(Difficulty level)
         const int pick =
             candidates.size() == 1
                 ? candidates.front()
-                : candidates[static_cast<std::size_t>(randomSource()->next(
-                      static_cast<int>(candidates.size())))];
-        std::swap(m_board[static_cast<std::size_t>(blank)],
-                  m_board[static_cast<std::size_t>(pick)]);
+                : candidates[static_cast<std::size_t>(randomSource()->next(static_cast<int>(candidates.size())))];
+        std::swap(m_board[static_cast<std::size_t>(blank)], m_board[static_cast<std::size_t>(pick)]);
         previousBlank = blank;
     }
 
@@ -143,8 +139,7 @@ bool GameState::move(int index)
     }
 
     const int blank = blankIndex();
-    std::swap(m_board[static_cast<std::size_t>(index)],
-              m_board[static_cast<std::size_t>(blank)]);
+    std::swap(m_board[static_cast<std::size_t>(index)], m_board[static_cast<std::size_t>(blank)]);
     ++m_moveCount;
     m_history.push_back(blank);
     return true;
@@ -165,8 +160,7 @@ bool GameState::undo()
         return false;
     }
 
-    std::swap(m_board[static_cast<std::size_t>(from)],
-              m_board[static_cast<std::size_t>(blank)]);
+    std::swap(m_board[static_cast<std::size_t>(from)], m_board[static_cast<std::size_t>(blank)]);
     if (m_moveCount > 0)
     {
         --m_moveCount;

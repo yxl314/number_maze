@@ -96,10 +96,11 @@ Qt 5.5 的 qmake 不支持 `CONFIG += c++14`，`number-maze.pri` 直接指定
 ### cxx_ci
 
 ```bash
-python3 ../cxx_ci/ci/ci.py -c ci.toml
+python3 ../cxx_ci/ci/ci.py ci.toml
 ```
 
-流水线执行 clean → configure → build → 5 个测试工程，固定 6 路并行。
+流水线执行 clean → configure → build → 5 个测试工程；并行度由 `--jobs`
+控制（`check.sh` 默认取本机核数）。
 
 ## 测试
 
@@ -118,7 +119,7 @@ QMAKE=qmake5 ./tests/run_all.sh model   # 只跑名字含 model 的
 | `service_tests` | QtCore | 最佳成绩持久化 |
 | `controller_tests` | QtWidgets/QtTest | Model→View 推送、状态栏、悔棋、重开、记录加载 |
 
-产物落在 `build/tests/<name>/bin/`，不污染源码目录。`run_all.sh` 默认 6 路并行，
+产物落在 `build/tests/<name>/bin/`，不污染源码目录。`run_all.sh` 缺省 4 路并行、可用 `JOBS` 覆盖，
 测试界面时导出 `QT_QPA_PLATFORM=offscreen`，无需 Xvfb。
 
 ### 架构门禁
@@ -134,15 +135,18 @@ selftest 用负向 fixture 证明门禁会失败。
 ### 检查入口
 
 ```bash
-./check.sh all     # CI + standardize + audit
+./check.sh all     # CI + style + 分层 + audit
 ./check.sh ci      # 构建与测试
-./check.sh style   # 主工程 src 的全量 tidy
-./check.sh audit   # clang-tidy + CPD + Valgrind
+./check.sh style   # src/tests 的 clang-format 检查
+./check.sh layer   # 分层与清单门禁
+./check.sh audit   # CPD + Valgrind（tidy 因 Qt 5.6 工具链限制暂关）
 ```
 
-`standardize` 覆盖主工程 `src`；测试是独立 qmake 工程，不在主工程的
-`compile_commands.json` 中，由 `cxx_ci` 负责构建和运行。禁改区/第三方代码由
-`exclude` 排除，Qt 自身头文件由 `.clang-tidy` 的 `HeaderFilterRegex` 忽略。
+`standardize` 的格式检查覆盖 `src` 与 `tests`；测试是独立 qmake 工程，不在
+主工程的 `compile_commands.json` 中，由 `cxx_ci` 负责构建和运行。
+当前 clang-tidy 14~21 无法解析 Qt 5.6.3 头文件，`standardize.toml` 与
+`audit.toml` 暂关 tidy，`format` 门禁保持开启；Qt 6 迁移或换用兼容
+clang-tidy 后恢复。
 
 ## 打包（cxx_pkg）
 
@@ -151,8 +155,8 @@ RPATH 改写和包输出：
 
 ```bash
 python3 ../cxx_pkg/cxx_pkg.py --config cxx_pkg.ini
-# 产物：dist/number-maze-2.0.0-aarch64.tar.gz
-#       dist/number-maze-2.0.0-aarch64.run
+# 产物：dist/number-maze-2.0.0-x86_64.tar.gz
+#       dist/number-maze-2.0.0-x86_64.run
 ```
 
 本地 Qt 5 的路径由配置显式指定：
@@ -164,7 +168,8 @@ make_args = -j4
 
 [qt]
 enabled = true
-prefix = /usr
+# 必须与 `qmake5 -query QT_INSTALL_PREFIX` 一致；换构建机时同步修改。
+prefix = /opt/qt-5.6.3
 ```
 
 包内会自动带上：
@@ -177,7 +182,7 @@ prefix = /usr
 非 root 验证 `.run`：
 
 ```bash
-DESTDIR=/tmp/number-maze-root ./dist/number-maze-2.0.0-aarch64.run
+DESTDIR=/tmp/number-maze-root ./dist/number-maze-2.0.0-x86_64.run
 /tmp/number-maze-root/opt/number-maze/number-maze
 ```
 

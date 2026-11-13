@@ -317,7 +317,8 @@ Guard::Guard(const std::string& key, const std::string& runtime_dir)
     {
         const int error = errno;
         ::close(fd);
-        if (error == EWOULDBLOCK || error == EAGAIN)
+        // Linux 上 EWOULDBLOCK 与 EAGAIN 相等；分开判断会触发 -Wlogical-op。
+        if (error == EAGAIN || (EWOULDBLOCK != EAGAIN && error == EWOULDBLOCK))
         {
             state_ = State::AlreadyRunning;
             error_code_ = 0;

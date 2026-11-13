@@ -21,7 +21,7 @@ void showAbout(QWidget* parent);
 /// @brief 基于 QMessageBox 的 SolvedSink 实现。
 class MessageBoxSolvedSink : public SolvedSink
 {
-public:
+  public:
     /**
      * @brief 保存消息框的父控件。
      * @param parent 消息框父控件。
@@ -34,8 +34,8 @@ public:
      */
     void showSolved(const SolvedInfo& info) override;
 
-private:
-    QWidget* m_parent = nullptr;  ///< 消息框的父控件，可为空。
+  private:
+    QWidget* m_parent = nullptr; ///< 消息框的父控件，可为空。
 };
 
 } // namespace view

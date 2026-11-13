@@ -15,7 +15,7 @@ namespace view
 /// @brief 接收状态栏文本与窗口标题变化。
 class StatusSink
 {
-public:
+  public:
     /// @brief 允许通过端口指针销毁具体实现。
     virtual ~StatusSink() = default;
 
@@ -35,7 +35,7 @@ public:
 /// @brief 接收通关结果的展示请求。
 class SolvedSink
 {
-public:
+  public:
     /// @brief 允许通过端口指针销毁具体实现。
     virtual ~SolvedSink() = default;
 

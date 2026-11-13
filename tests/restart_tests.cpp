@@ -18,7 +18,7 @@
  */
 int main()
 {
-    int  fail  = 0;
+    int fail = 0;
     auto check = [&](bool v_ok, const char* v_what)
     {
         std::printf("  [%s] %s\n", v_ok ? "通过" : "失败", v_what);

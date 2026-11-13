@@ -40,7 +40,7 @@ class GameController : public QObject
 {
     Q_OBJECT
 
-public:
+  public:
     /**
      * @brief 保存各协作者，此时不做信号连接。
      *
@@ -54,18 +54,13 @@ public:
      * @param catalog 难度名称表，用于生成界面文本。
      * @param parent Qt 对象树的父对象。
      */
-    GameController(view::BoardView* view,
-                   model::GameModel* model,
-                   view::StatusSink* status,
-                   view::SolvedSink* solved,
-                   service::RecordStore* records,
-                   const view::DifficultyCatalog* catalog,
-                   QObject* parent = nullptr);
+    GameController(view::BoardView* view, model::GameModel* model, view::StatusSink* status, view::SolvedSink* solved,
+                   service::RecordStore* records, const view::DifficultyCatalog* catalog, QObject* parent = nullptr);
 
     /// @brief 连接信号、载入纪录并做一次初始同步。
     void initialize();
 
-public slots:
+  public slots:
     /**
      * @brief 开始指定难度的新一局。
      * @param level 菜单中选定的难度。
@@ -78,7 +73,7 @@ public slots:
     /// @brief 撤销最近一次移动。
     void handleUndo();
 
-private slots:
+  private slots:
     /**
      * @brief 把点击转成模型的移动请求。
      * @param index 被点击的节点下标。
@@ -99,7 +94,7 @@ private slots:
      */
     void handleSolved(int moves, int seconds, bool newRecord);
 
-private:
+  private:
     /// @brief 用模型当前状态组装一帧完整的 BoardFrame 推给视图。
     void syncBoardToView();
 
@@ -109,12 +104,12 @@ private:
     /// @brief 从持久化存储读出各难度最佳步数并写入模型。
     void loadRecords();
 
-    view::BoardView* m_view = nullptr;  ///< 被动棋盘视图，不持有所有权。
-    model::GameModel* m_model = nullptr;  ///< 游戏模型，不持有所有权。
-    view::StatusSink* m_status = nullptr;  ///< 状态栏输出端口，可为空。
-    view::SolvedSink* m_solved = nullptr;  ///< 通关结果输出端口，可为空。
-    service::RecordStore* m_records = nullptr;  ///< 最佳成绩存储，可为空。
-    const view::DifficultyCatalog* m_catalog = nullptr;  ///< 难度名称表，可为空。
+    view::BoardView* m_view = nullptr;                  ///< 被动棋盘视图，不持有所有权。
+    model::GameModel* m_model = nullptr;                ///< 游戏模型，不持有所有权。
+    view::StatusSink* m_status = nullptr;               ///< 状态栏输出端口，可为空。
+    view::SolvedSink* m_solved = nullptr;               ///< 通关结果输出端口，可为空。
+    service::RecordStore* m_records = nullptr;          ///< 最佳成绩存储，可为空。
+    const view::DifficultyCatalog* m_catalog = nullptr; ///< 难度名称表，可为空。
 };
 
 } // namespace controller

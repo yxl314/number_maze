@@ -131,8 +131,9 @@ GameModel 判定新纪录 → solved(moves, seconds, true)
 - 主程序全量加入；测试按覆盖范围加入子集。新增文件必须显式加入清单。
 - 第三方源码 `third_party/singleproc`、`third_party/stacklog` 只由主程序加入，
   测试不依赖它们。
-- 并行上限固定为 4：`tests/run_all.sh` 的 `JOBS=4`、cxx_ci 默认 `--jobs 4`、
-  `audit.toml` 的 `jobs=4`、`cxx_pkg.ini` 的 `make_args=-j4`。
+- 并行度默认自适应本机核数：`check.sh` 把 `nproc` 传给 cxx_ci/cxx_audit；
+  `tests/run_all.sh` 缺省 4 路、可用 `JOBS` 覆盖；`cxx_pkg.ini` 的
+  `make_args=-j4` 可被 `--jobs` 覆盖。
 
 ## 5. 错误与持久化
 

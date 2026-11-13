@@ -26,7 +26,7 @@ constexpr int g_node_count = g_board_size * g_board_size;
  */
 class Graph
 {
-public:
+  public:
     /// @brief 构建完整拓扑。
     Graph();
 
@@ -80,7 +80,7 @@ public:
      */
     static int solvedValueAt(int index);
 
-private:
+  private:
     /**
      * @brief 添加一条无向边。
      *
@@ -91,8 +91,8 @@ private:
      */
     void addEdge(int a, int b);
 
-    std::array<std::vector<int>, g_node_count> m_adjacency;  ///< 每个节点的邻居表，每条无向边双向登记。
-    std::size_t m_edgeCount = 0;  ///< 无向边总数；重复边不计数。
+    std::array<std::vector<int>, g_node_count> m_adjacency; ///< 每个节点的邻居表，每条无向边双向登记。
+    std::size_t m_edgeCount = 0;                            ///< 无向边总数；重复边不计数。
 };
 
 } // namespace domain

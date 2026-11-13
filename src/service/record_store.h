@@ -21,7 +21,7 @@ namespace service
  */
 class RecordStore
 {
-public:
+  public:
     /**
      * @brief 接管一个配置实例。
      * @param settings 由本对象持有的配置实例；测试中可以为 nullptr。
@@ -49,7 +49,7 @@ public:
      */
     void saveBestMoves(domain::Difficulty level, int moves);
 
-private:
+  private:
     /**
      * @brief 难度在配置键中的下标。
      * @param level 难度等级。
@@ -57,7 +57,7 @@ private:
      */
     static int levelIndex(domain::Difficulty level);
 
-    std::unique_ptr<QSettings> m_settings;  ///< 配置存储；测试中可为空。
+    std::unique_ptr<QSettings> m_settings; ///< 配置存储；测试中可为空。
 };
 
 } // namespace service

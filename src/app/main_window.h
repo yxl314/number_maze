@@ -48,7 +48,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-public:
+  public:
     /**
      * @brief 组装模型、被动视图、服务与控制器。
      * @param parent 父窗口。
@@ -59,7 +59,7 @@ public:
     /// @brief 先释放控制器，避免它晚于成员辅助对象销毁。
     ~MainWindow() override;
 
-private:
+  private:
     /// @brief 建立“游戏”与“帮助”菜单，并把动作接到控制器槽。
     void setupMenus();
 
@@ -72,21 +72,21 @@ private:
     /// @brief 建立悔棋动作：快捷键 Ctrl+Z，初始不可用。
     void createUndoAction();
 
-    view::BoardView* m_view = nullptr;  ///< 中央棋盘控件，由 Qt 对象树持有。
-    model::GameModel* m_model = nullptr;  ///< 游戏模型，由 Qt 对象树持有。
-    controller::GameController* m_controller = nullptr;  ///< 控制器；析构时先于其协作者手动释放。
+    view::BoardView* m_view = nullptr;                  ///< 中央棋盘控件，由 Qt 对象树持有。
+    model::GameModel* m_model = nullptr;                ///< 游戏模型，由 Qt 对象树持有。
+    controller::GameController* m_controller = nullptr; ///< 控制器；析构时先于其协作者手动释放。
 
-    std::unique_ptr<view::DifficultyCatalog> m_catalog;  ///< 难度名称表，供菜单与控制器生成文本。
-    std::unique_ptr<view::StatusBarView> m_statusView;  ///< 状态栏输出端口的实现。
-    std::unique_ptr<view::MessageBoxSolvedSink> m_solvedSink;  ///< 通关结果输出端口的实现。
-    std::unique_ptr<service::RecordStore> m_records;  ///< 基于 @c QSettings 的最佳成绩存储。
+    std::unique_ptr<view::DifficultyCatalog> m_catalog;       ///< 难度名称表，供菜单与控制器生成文本。
+    std::unique_ptr<view::StatusBarView> m_statusView;        ///< 状态栏输出端口的实现。
+    std::unique_ptr<view::MessageBoxSolvedSink> m_solvedSink; ///< 通关结果输出端口的实现。
+    std::unique_ptr<service::RecordStore> m_records;          ///< 基于 @c QSettings 的最佳成绩存储。
 
     QAction* m_restartAction = nullptr;  ///< 重开本局动作，同时加入菜单与工具栏。
-    QAction* m_undoAction = nullptr;  ///< 悔棋动作，可用状态由状态栏同步。
-    QLabel* m_difficultyLabel = nullptr;  ///< 状态栏中的难度标签。
-    QLabel* m_movesLabel = nullptr;  ///< 状态栏中的步数标签。
-    QLabel* m_timeLabel = nullptr;  ///< 状态栏中的用时标签。
-    QLabel* m_bestLabel = nullptr;  ///< 状态栏右侧常驻的最佳成绩标签。
+    QAction* m_undoAction = nullptr;     ///< 悔棋动作，可用状态由状态栏同步。
+    QLabel* m_difficultyLabel = nullptr; ///< 状态栏中的难度标签。
+    QLabel* m_movesLabel = nullptr;      ///< 状态栏中的步数标签。
+    QLabel* m_timeLabel = nullptr;       ///< 状态栏中的用时标签。
+    QLabel* m_bestLabel = nullptr;       ///< 状态栏右侧常驻的最佳成绩标签。
 };
 
 } // namespace app

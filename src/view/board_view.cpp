@@ -22,8 +22,7 @@ const QColor g_solved_color(255, 214, 102);
 
 } // namespace
 
-BoardView::BoardView(QWidget* parent)
-    : QWidget(parent)
+BoardView::BoardView(QWidget* parent) : QWidget(parent)
 {
     setMouseTracking(true);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -76,9 +75,7 @@ QRectF BoardView::boardRect() const
 {
     const qreal side = qMin(width(), height());
     const qreal margin = side * 0.045;
-    return QRectF(((width() - side) / 2.0) + margin,
-                  ((height() - side) / 2.0) + margin,
-                  side - (2 * margin),
+    return QRectF(((width() - side) / 2.0) + margin, ((height() - side) / 2.0) + margin, side - (2 * margin),
                   side - (2 * margin));
 }
 
@@ -227,8 +224,7 @@ void BoardView::drawTiles(QPainter& painter, qreal radius) const
         }
 
         painter.setPen(g_tile_text_color);
-        painter.drawText(QRectF(center.x() - radius, center.y() - radius, 2 * radius, 2 * radius),
-                         Qt::AlignCenter,
+        painter.drawText(QRectF(center.x() - radius, center.y() - radius, 2 * radius, 2 * radius), Qt::AlignCenter,
                          text);
         painter.setFont(font);
     }
@@ -274,8 +270,7 @@ void BoardView::mouseMoveEvent(QMouseEvent* event)
     }
 
     m_hover = index;
-    const bool clickable =
-        index >= 0 && index < m_movable.size() && m_movable.at(index) && !m_solved;
+    const bool clickable = index >= 0 && index < m_movable.size() && m_movable.at(index) && !m_solved;
     setCursor(clickable ? Qt::PointingHandCursor : Qt::ArrowCursor);
     update();
 }

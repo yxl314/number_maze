@@ -7,11 +7,7 @@ namespace view
 
 const std::array<domain::Difficulty, domain::kDifficultyCount>& DifficultyCatalog::all() const
 {
-    static const std::array<domain::Difficulty, domain::kDifficultyCount> levels = {
-        domain::Difficulty::Easy,
-        domain::Difficulty::Normal,
-        domain::Difficulty::Hard,
-        domain::Difficulty::Expert};
+    static const std::array<domain::Difficulty, domain::kDifficultyCount> levels = domain::allDifficulties();
     return levels;
 }
 

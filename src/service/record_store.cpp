@@ -18,17 +18,13 @@ QString recordKey(domain::Difficulty level)
 
 } // namespace
 
-RecordStore::RecordStore(std::unique_ptr<QSettings> settings)
-    : m_settings(std::move(settings))
-{
-}
+RecordStore::RecordStore(std::unique_ptr<QSettings> settings) : m_settings(std::move(settings)) {}
 
 RecordStore::~RecordStore() = default;
 
 int RecordStore::levelIndex(domain::Difficulty level)
 {
-    const int index = static_cast<int>(level);
-    return index >= 0 && index < domain::kDifficultyCount ? index : 0;
+    return domain::difficultyIndex(level);
 }
 
 int RecordStore::bestMoves(domain::Difficulty level) const
@@ -37,8 +33,7 @@ int RecordStore::bestMoves(domain::Difficulty level) const
     {
         return 0;
     }
-    const int value =
-        m_settings->value(recordKey(domain::Difficulty(levelIndex(level))), 0).toInt();
+    const int value = m_settings->value(recordKey(domain::Difficulty(levelIndex(level))), 0).toInt();
     return value > 0 ? value : 0;
 }
 

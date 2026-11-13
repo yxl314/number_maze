@@ -14,10 +14,10 @@ namespace view
 /// @brief 一帧完整的棋盘数据。
 struct BoardFrame
 {
-    QVector<int> board;      ///< 节点取值；0 表示空格。
-    QVector<bool> movable;   ///< 每个节点的可移动标记。
-    bool solved = false;     ///< 是否已完成。
-    int solvedMoves = 0;     ///< 完成遮罩中显示的步数。
+    QVector<int> board;    ///< 节点取值；0 表示空格。
+    QVector<bool> movable; ///< 每个节点的可移动标记。
+    bool solved = false;   ///< 是否已完成。
+    int solvedMoves = 0;   ///< 完成遮罩中显示的步数。
 };
 
 /// @brief 一份完整的状态栏状态。

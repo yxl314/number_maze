@@ -41,6 +41,10 @@ QT_FORBIDDEN = {
 INCLUDE_RE = re.compile(r'^\s*#\s*include\s*([<"])([^>"]+)[>"]')
 QT_INCLUDE_RE = re.compile(r'^\s*#\s*include\s*[<"]Q[A-Za-z0-9_/]*[>"]')
 CJK_RE = re.compile(r'[\u4e00-\u9fff]')
+
+# 只检查字符串字面量里的中文：那是会显示给用户的文本。注释里的中文是
+# Doxygen 文档，不算显示文本，不能因此让整个 domain/model/service 全红。
+STRING_LITERAL_RE = re.compile(r'"(?:[^"\\\n]|\\.)*"|\'(?:[^\'\\\n]|\\.)*\'')
 MANIFEST_GROUP_RE = re.compile(
     r'^(NUMBERMAZE_(?:DOMAIN|MODEL|SERVICE|VIEW|CONTROLLER|APP|MAIN))'
     r'_(?:SOURCES|HEADERS)\s*=\s*(.*)$')
@@ -107,9 +111,16 @@ def check_manifest(root: Path, sources: list[Path]) -> list[str]:
         return ["number-maze.pri is missing"]
     text = manifest.read_text(encoding="utf-8", errors="replace")
 
+    # 按空白切成路径 token，避免 a.cpp 被 a.cpp.bak 之类的子串误命中。
+    manifest_paths: set[str] = set()
+    for line in logical_lines(text):
+        for token in line.split():
+            token = token.replace("$$NUMBERMAZE_ROOT/", "")
+            manifest_paths.add(token)
+
     for source in sources:
         rel = source.relative_to(root).as_posix()
-        if rel not in text:
+        if rel not in manifest_paths:
             problems.append(f"{source}: source file is not listed in number-maze.pri")
 
     listed: dict[str, list[str]] = {}
@@ -166,8 +177,13 @@ def main() -> int:
         sources.append(path)
         text = path.read_text(encoding="utf-8", errors="replace")
 
-        if layer in {"domain", "model", "service"} and CJK_RE.search(text):
-            problems.append(f"{path}: Chinese display text is forbidden in {layer}/")
+        if layer in {"domain", "model", "service"}:
+            for literal in STRING_LITERAL_RE.finditer(text):
+                if CJK_RE.search(literal.group(0)):
+                    lineno = text.count("\n", 0, literal.start()) + 1
+                    problems.append(
+                        f"{path}:{lineno}: Chinese display text is forbidden in {layer}/")
+                    break
 
         for lineno, line in enumerate(text.splitlines(), 1):
             if layer == "domain" and QT_INCLUDE_RE.match(line):
@@ -183,7 +199,8 @@ def main() -> int:
                     f"{path}:{lineno}: non-canonical or escaping include is forbidden: {raw_target}")
                 continue
             if canonical is None:
-                header = raw_target.split("/")[0].split(".")[0]
+                # <QtCore/QSettings> 的模块前缀是 QtCore，真正头名是最后一段。
+                header = raw_target.replace("\\", "/").rsplit("/", 1)[-1].split(".")[0]
                 if layer in QT_FORBIDDEN and header in QT_FORBIDDEN[layer]:
                     problems.append(f"{path}:{lineno}: {layer} may not include {raw_target}")
                 continue

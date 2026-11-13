@@ -14,8 +14,7 @@ constexpr int g_tick_interval_ms = 1000;
 
 } // namespace
 
-GameModel::GameModel(QObject* parent)
-    : QObject(parent), m_timer(new QTimer(this))
+GameModel::GameModel(QObject* parent) : QObject(parent), m_timer(new QTimer(this))
 {
     m_timer->setInterval(g_tick_interval_ms);
     connect(m_timer, &QTimer::timeout, this, &GameModel::onTick);
@@ -23,8 +22,7 @@ GameModel::GameModel(QObject* parent)
 
 int GameModel::levelIndex(domain::Difficulty level) const
 {
-    const int index = static_cast<int>(level);
-    return index >= 0 && index < domain::kDifficultyCount ? index : 0;
+    return domain::difficultyIndex(level);
 }
 
 int GameModel::bestRecord(domain::Difficulty level) const
@@ -84,21 +82,17 @@ QVector<bool> GameModel::movableData() const
 
 void GameModel::startNewGame(domain::Difficulty level)
 {
-    m_difficulty = level;
+    // 非法难度统一按 Normal 处理，避免界面文案、打乱步数和纪录下标三者不一致。
+    m_difficulty = (levelIndex(level) == static_cast<int>(level)) ? level : domain::Difficulty::Normal;
     m_elapsedSeconds = 0;
     m_solvedNotified = false;
     stopTimer();
 
-    m_state.scramble(level);
+    m_state.scramble(m_difficulty);
     m_initialBoard = m_state.board();
 
     emit boardChanged();
     emit statusChanged();
-}
-
-void GameModel::startNewGame()
-{
-    startNewGame(m_difficulty);
 }
 
 void GameModel::restartCurrentGame()

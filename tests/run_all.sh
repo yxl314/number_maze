@@ -4,7 +4,7 @@
 #     ./tests/run_all.sh            # 全部
 #     ./tests/run_all.sh model      # 只跑名字含 model 的
 #
-# 产物放在 build/tests/；并行上限固定为 4。
+# 产物放在 build/tests/；缺省 4 路并行，可用 JOBS 覆盖。
 set -u
 
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -14,6 +14,7 @@ JOBS=${JOBS:-4}
 FILTER=${1:-}
 OUT="$ROOT/build/tests"
 STATUS=0
+MATCHED=0
 
 export QT_QPA_PLATFORM=offscreen
 
@@ -23,6 +24,7 @@ for pro in "$HERE"/*_tests.pro; do
         *"$FILTER"*) ;;
         *) continue ;;
     esac
+    MATCHED=$((MATCHED + 1))
     dir="$OUT/$name"
     printf '=== %s ===\n' "$name"
     mkdir -p "$dir" || exit 1
@@ -36,5 +38,10 @@ for pro in "$HERE"/*_tests.pro; do
         STATUS=1
     fi
 done
+
+if [ "$MATCHED" -eq 0 ]; then
+    printf '没有测试匹配过滤条件: %s\n' "${FILTER:-<无>}" >&2
+    exit 2
+fi
 
 exit $STATUS

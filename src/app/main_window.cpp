@@ -23,8 +23,7 @@
 namespace app
 {
 
-MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent)
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
     setWindowTitle(QStringLiteral("数字迷宫"));
 
@@ -36,19 +35,13 @@ MainWindow::MainWindow(QWidget* parent)
     createUndoAction();
 
     m_catalog = std::make_unique<view::DifficultyCatalog>();
-    m_statusView = std::make_unique<view::StatusBarView>(
-        this, m_difficultyLabel, m_movesLabel, m_timeLabel, m_bestLabel, m_undoAction);
+    m_statusView = std::make_unique<view::StatusBarView>(this, m_difficultyLabel, m_movesLabel, m_timeLabel,
+                                                         m_bestLabel, m_undoAction);
     m_solvedSink = std::make_unique<view::MessageBoxSolvedSink>(this);
-    m_records = std::make_unique<service::RecordStore>(
-        std::make_unique<QSettings>());
+    m_records = std::make_unique<service::RecordStore>(std::make_unique<QSettings>());
 
-    m_controller = new controller::GameController(m_view,
-                                                  m_model,
-                                                  m_statusView.get(),
-                                                  m_solvedSink.get(),
-                                                  m_records.get(),
-                                                  m_catalog.get(),
-                                                  this);
+    m_controller = new controller::GameController(m_view, m_model, m_statusView.get(), m_solvedSink.get(),
+                                                  m_records.get(), m_catalog.get(), this);
     connect(m_undoAction, &QAction::triggered, m_controller, &controller::GameController::handleUndo);
 
     setupMenus();

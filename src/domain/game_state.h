@@ -23,11 +23,11 @@ namespace domain
  */
 class GameState
 {
-public:
+  public:
     /// @brief 可注入的随机源，让测试能拿到确定的结果。
     class Random
     {
-    public:
+      public:
         /// @brief 允许通过基类指针销毁派生的随机源。
         virtual ~Random() = default;
 
@@ -124,7 +124,7 @@ public:
      */
     bool restore(const std::vector<int>& snapshot);
 
-private:
+  private:
     /// @brief 回到已完成局面并清空历史与步数。
     void reset();
 
@@ -142,11 +142,11 @@ private:
      */
     static bool isValidBoard(const std::array<int, g_node_count>& board);
 
-    Graph m_graph;  ///< 固定拓扑，构造后保持不变。
-    std::array<int, g_node_count> m_board{};  ///< 每个节点的取值；0 表示空格。
-    std::vector<int> m_history;  ///< 悔棋历史；每项记录一次移动前的空格下标。
-    int m_moveCount = 0;  ///< 上一次打乱或恢复以来的玩家步数。
-    Random* m_random = nullptr;  ///< 注入的随机源；为空时使用进程内共享的内置随机源。
+    Graph m_graph;                           ///< 固定拓扑，构造后保持不变。
+    std::array<int, g_node_count> m_board{}; ///< 每个节点的取值；0 表示空格。
+    std::vector<int> m_history;              ///< 悔棋历史；每项记录一次移动前的空格下标。
+    int m_moveCount = 0;                     ///< 上一次打乱或恢复以来的玩家步数。
+    Random* m_random = nullptr;              ///< 注入的随机源；为空时使用进程内共享的内置随机源。
 };
 
 } // namespace domain

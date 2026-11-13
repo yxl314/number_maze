@@ -14,19 +14,10 @@
 namespace controller
 {
 
-GameController::GameController(view::BoardView* view,
-                               model::GameModel* model,
-                               view::StatusSink* status,
-                               view::SolvedSink* solved,
-                               service::RecordStore* records,
-                               const view::DifficultyCatalog* catalog,
-                               QObject* parent)
-    : QObject(parent),
-      m_view(view),
-      m_model(model),
-      m_status(status),
-      m_solved(solved),
-      m_records(records),
+GameController::GameController(view::BoardView* view, model::GameModel* model, view::StatusSink* status,
+                               view::SolvedSink* solved, service::RecordStore* records,
+                               const view::DifficultyCatalog* catalog, QObject* parent)
+    : QObject(parent), m_view(view), m_model(model), m_status(status), m_solved(solved), m_records(records),
       m_catalog(catalog)
 {
 }
@@ -53,11 +44,7 @@ void GameController::loadRecords()
         return;
     }
 
-    const std::array<domain::Difficulty, domain::kDifficultyCount> levels = {
-        domain::Difficulty::Easy,
-        domain::Difficulty::Normal,
-        domain::Difficulty::Hard,
-        domain::Difficulty::Expert};
+    const std::array<domain::Difficulty, domain::kDifficultyCount> levels = domain::allDifficulties();
     std::array<int, domain::kDifficultyCount> records{};
     for (std::size_t i = 0; i < levels.size(); ++i)
     {

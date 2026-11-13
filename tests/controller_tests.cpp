@@ -16,7 +16,7 @@ namespace
 
 class FakeStatus : public view::StatusSink
 {
-public:
+  public:
     void applyStatus(const view::StatusState& state) override
     {
         last = state;
@@ -35,7 +35,7 @@ public:
 
 class FakeSolved : public view::SolvedSink
 {
-public:
+  public:
     void showSolved(const view::SolvedInfo& info) override
     {
         last = info;
@@ -64,7 +64,7 @@ class ControllerTests : public QObject
 {
     Q_OBJECT
 
-private slots:
+  private slots:
     void wiringAndStateFlow();
 };
 
@@ -82,8 +82,7 @@ void ControllerTests::wiringAndStateFlow()
     view::DifficultyCatalog catalog;
     FakeStatus status;
     FakeSolved solved;
-    controller::GameController controller(
-        &view, &model, &status, &solved, &records, &catalog);
+    controller::GameController controller(&view, &model, &status, &solved, &records, &catalog);
 
     controller.initialize();
 

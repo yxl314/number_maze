@@ -17,8 +17,8 @@ namespace
 // 确定性随机源，使测试结果可复现
 class FixedRandom : public domain::GameState::Random
 {
-public:
-    explicit FixedRandom(unsigned v_seed): m_state(v_seed) {}
+  public:
+    explicit FixedRandom(unsigned v_seed) : m_state(v_seed) {}
 
     int next(int v_bound) override
     {
@@ -26,11 +26,11 @@ public:
         return int((m_state >> 16) % unsigned(v_bound));
     }
 
-private:
+  private:
     unsigned m_state;
 };
 
-int  g_failures = 0;
+int g_failures = 0;
 
 const char* difficultyLabel(domain::Difficulty v_level)
 {
@@ -93,7 +93,7 @@ void testGraph()
 void testBasics()
 {
     std::puts("=== 基本状态 ===");
-    FixedRandom     rng(12345);
+    FixedRandom rng(12345);
     domain::GameState st(&rng);
 
     check(st.isSolved(), "初始为已解状态");
@@ -122,10 +122,10 @@ void testBasics()
 void testMoveUndo()
 {
     std::puts("=== 移动与撤销 ===");
-    FixedRandom     rng(999);
+    FixedRandom rng(999);
     domain::GameState st(&rng);
 
-    int             target = -1;
+    int target = -1;
     for (int i = 0; i < domain::g_node_count; ++i)
     {
         if (st.isMovable(i))
@@ -149,10 +149,10 @@ void testMoveUndo()
 void testScramble()
 {
     std::puts("=== 打乱 ===");
-    FixedRandom            rng(2024);
+    FixedRandom rng(2024);
 
-    const domain::Difficulty levels[] = {
-        domain::Difficulty::Easy, domain::Difficulty::Normal, domain::Difficulty::Hard, domain::Difficulty::Expert};
+    const domain::Difficulty levels[] = {domain::Difficulty::Easy, domain::Difficulty::Normal, domain::Difficulty::Hard,
+                                         domain::Difficulty::Expert};
 
     bool _all_ok = true;
     for (domain::Difficulty lvl : levels)
@@ -160,15 +160,15 @@ void testScramble()
         domain::GameState st(&rng);
         st.scramble(lvl);
 
-        const bool             scrambled        = !st.isSolved();
+        const bool scrambled = !st.isSolved();
         const std::vector<int> _scrambled_board = st.board();
 
         // 打乱不计入步数，也不产生撤销历史
-        const bool             _no_history      = !st.canUndo();
-        const bool             _zero_moves      = (st.moveCount() == 0);
+        const bool _no_history = !st.canUndo();
+        const bool _zero_moves = (st.moveCount() == 0);
 
         // 走一步再撤销，应精确回到打乱后的局面（而非已解局面）
-        int                    idx              = -1;
+        int idx = -1;
         for (int i = 0; i < domain::g_node_count; ++i)
         {
             if (st.isMovable(i))
@@ -182,11 +182,8 @@ void testScramble()
         st.undo();
         const bool restored = (st.board() == _scrambled_board);
 
-        std::printf("  难度 %s：打乱生效=%s 无历史=%s 步数为0=%s 撤销回打乱态=%s\n",
-                    difficultyLabel(lvl),
-                    scrambled ? "是" : "否",
-                    _no_history ? "是" : "否",
-                    _zero_moves ? "是" : "否",
+        std::printf("  难度 %s：打乱生效=%s 无历史=%s 步数为0=%s 撤销回打乱态=%s\n", difficultyLabel(lvl),
+                    scrambled ? "是" : "否", _no_history ? "是" : "否", _zero_moves ? "是" : "否",
                     restored ? "是" : "否");
 
         if (!scrambled || !_no_history || !_zero_moves || !_moved_away || !restored)
@@ -203,16 +200,16 @@ void testSolvabilityByUndo()
     std::puts("=== 可解性：移动全部撤销即复原 ===");
     FixedRandom rng(7);
 
-    bool        _all_ok = true;
+    bool _all_ok = true;
     for (int trial = 0; trial < 10; ++trial)
     {
         domain::GameState st(&rng);
-        const int       steps           = 20 + (trial * 17);
-        int             _previous_blank = -1;
+        const int steps = 20 + (trial * 17);
+        int _previous_blank = -1;
 
         for (int k = 0; k < steps; ++k)
         {
-            const int        blank = st.blankIndex();
+            const int blank = st.blankIndex();
             std::vector<int> candidates;
             for (int nb : st.graph().neighbors(blank))
             {
@@ -239,7 +236,7 @@ void testSolvabilityByUndo()
         }
 
         const bool scrambled = !st.isSolved();
-        int        undone    = 0;
+        int undone = 0;
         while (st.undo())
         {
             ++undone;
@@ -247,8 +244,8 @@ void testSolvabilityByUndo()
 
         if (!scrambled || undone != steps || !st.isSolved())
         {
-            std::printf(
-                "  第 %d 轮失败：走 %d 步、撤销 %d 步、已解=%s\n", trial, steps, undone, st.isSolved() ? "是" : "否");
+            std::printf("  第 %d 轮失败：走 %d 步、撤销 %d 步、已解=%s\n", trial, steps, undone,
+                        st.isSolved() ? "是" : "否");
             _all_ok = false;
         }
     }

@@ -8,18 +8,9 @@
 namespace view
 {
 
-StatusBarView::StatusBarView(QMainWindow* window,
-                             QLabel* difficulty,
-                             QLabel* moves,
-                             QLabel* time,
-                             QLabel* best,
+StatusBarView::StatusBarView(QMainWindow* window, QLabel* difficulty, QLabel* moves, QLabel* time, QLabel* best,
                              QAction* undo)
-    : m_window(window),
-      m_difficulty(difficulty),
-      m_moves(moves),
-      m_time(time),
-      m_best(best),
-      m_undo(undo)
+    : m_window(window), m_difficulty(difficulty), m_moves(moves), m_time(time), m_best(best), m_undo(undo)
 {
 }
 
@@ -35,14 +26,13 @@ void StatusBarView::applyStatus(const StatusState& state)
     }
     if (m_time)
     {
-        m_time->setText(QStringLiteral("用时：%1")
-                            .arg(QTime(0, 0).addSecs(state.seconds).toString(QStringLiteral("hh:mm:ss"))));
+        m_time->setText(
+            QStringLiteral("用时：%1").arg(QTime(0, 0).addSecs(state.seconds).toString(QStringLiteral("hh:mm:ss"))));
     }
     if (m_best)
     {
-        m_best->setText(state.bestMoves > 0
-                            ? QStringLiteral("最佳：%1 步").arg(state.bestMoves)
-                            : QStringLiteral("最佳：暂无"));
+        m_best->setText(state.bestMoves > 0 ? QStringLiteral("最佳：%1 步").arg(state.bestMoves)
+                                            : QStringLiteral("最佳：暂无"));
     }
     if (m_undo)
     {

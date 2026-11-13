@@ -103,8 +103,18 @@ def main() -> int:
         False,
     )
     ok &= expect(
-        "model Chinese",
-        {"src/model/model.h": "// 中文说明\n"},
+        "model QSettings via module path",
+        {"src/model/model.h": "#include <QtCore/QSettings>\n"},
+        False,
+    )
+    ok &= expect(
+        "model Chinese comment",
+        {"src/model/model.h": "/// 中文注释是文档，不是显示文本\n"},
+        True,
+    )
+    ok &= expect(
+        "model Chinese literal",
+        {"src/model/model.h": 'inline const char* kMsg = "中文说明";\n'},
         False,
     )
     ok &= expect(
@@ -112,6 +122,16 @@ def main() -> int:
         {"src/domain/a.h": "#pragma once\n", "src/domain/b.h": "#pragma once\n"},
         True,
     )
+
+    root = write_tree({"src/domain/real.h": "#pragma once\n"})
+    (root / "number-maze.pri").write_text(
+        "NUMBERMAZE_DOMAIN_HEADERS = \\\n"
+        "    $$NUMBERMAZE_ROOT/src/domain/real.h.bak\n",
+        encoding="utf-8")
+    result = run_checker(root)
+    listed_ok = result.returncode == 1
+    print(f"{'PASS' if listed_ok else 'FAIL'} manifest substring is not a listing: exit={result.returncode}")
+    ok &= listed_ok
 
     root = write_tree({"src/domain/listed.h": "#pragma once\n"})
     (root / "src" / "domain" / "unlisted.h").write_text("#pragma once\n", encoding="utf-8")

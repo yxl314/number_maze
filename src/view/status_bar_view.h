@@ -17,7 +17,7 @@ namespace view
 /// @brief 为应用外壳生成状态栏文本与窗口标题。
 class StatusBarView : public StatusSink
 {
-public:
+  public:
     /**
      * @brief 保存要更新的控件，此处不写任何文本。
      *
@@ -30,12 +30,7 @@ public:
      * @param best 最佳成绩标签。
      * @param undo 随悔棋可用状态启停的动作。
      */
-    StatusBarView(QMainWindow* window,
-                  QLabel* difficulty,
-                  QLabel* moves,
-                  QLabel* time,
-                  QLabel* best,
-                  QAction* undo);
+    StatusBarView(QMainWindow* window, QLabel* difficulty, QLabel* moves, QLabel* time, QLabel* best, QAction* undo);
 
     /**
      * @brief 应用一份完整的状态栏状态。
@@ -49,13 +44,13 @@ public:
      */
     void setWindowTitle(const QString& title) override;
 
-private:
-    QMainWindow* m_window = nullptr;  ///< 需要更新标题的窗口，可为空。
+  private:
+    QMainWindow* m_window = nullptr; ///< 需要更新标题的窗口，可为空。
     QLabel* m_difficulty = nullptr;  ///< 难度标签，可为空。
-    QLabel* m_moves = nullptr;  ///< 步数标签，可为空。
-    QLabel* m_time = nullptr;  ///< 用时标签，可为空。
-    QLabel* m_best = nullptr;  ///< 最佳成绩标签，可为空。
-    QAction* m_undo = nullptr;  ///< 随悔棋可用状态启停的动作，可为空。
+    QLabel* m_moves = nullptr;       ///< 步数标签，可为空。
+    QLabel* m_time = nullptr;        ///< 用时标签，可为空。
+    QLabel* m_best = nullptr;        ///< 最佳成绩标签，可为空。
+    QAction* m_undo = nullptr;       ///< 随悔棋可用状态启停的动作，可为空。
 };
 
 } // namespace view

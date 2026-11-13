@@ -21,8 +21,9 @@
 
 ## 当前限制
 
-- 兼容目标仍是 Qt 5.5 / glibc 2.23 的构建环境；本机使用 Qt 5.15 验证。
-  Qt 6 可编译性不作为验收条件。
+- 兼容目标仍是 Qt 5.5 / glibc 2.23 的构建环境；本机使用 Qt 5.6.3 验证。
+  Qt 6 可编译性不作为验收条件，因此 clang-tidy 21 无法解析 Qt 5.6 头文件
+  的问题不计入代码缺陷；Qt 6 迁移后再恢复全量 tidy 门禁。
 - 最佳成绩持久化没有版本迁移机制；键名固定为 `records/<difficulty>`。
 - `GameState::restore()` 验证排列合法性，但不验证任意排列在该图上的可解性；
   当前快照只来自本局打乱结果和合法的 `board()`，因此运行时路径安全。
@@ -32,7 +33,7 @@
 ## 复核命令
 
 ```bash
-python3 ../cxx_ci/ci/ci.py -c ci.toml
+python3 ../cxx_ci/ci/ci.py ci.toml
 python3 ../cxx_pkg/cxx_pkg.py --config cxx_pkg.ini --format tar.gz
 PYTHONPATH=../cxx_audit/src python3 -m cpp_audit -c audit.toml all
 python3 tools/check_layering.py .
