@@ -159,14 +159,14 @@ class GameModel : public QObject
      */
     int levelIndex(domain::Difficulty level) const;
 
-    domain::GameState m_state;                                    ///< 棋盘状态、悔棋历史与步数。
-    std::vector<int> m_initialBoard;                              ///< 本局开始时的棋盘快照，供重开恢复。
+    domain::GameState m_state;       ///< 棋盘状态、悔棋历史与步数。
+    std::vector<int> m_initialBoard; ///< 本局开始时的棋盘快照，供重开恢复。
     domain::Difficulty m_difficulty = domain::Difficulty::Normal; ///< 本局选定的难度。
-    QTimer* m_timer = nullptr;                                    ///< 一秒一跳的计时器，由 Qt 对象树持有。
-    int m_elapsedSeconds = 0;                                     ///< 本局累计用时（秒）。
-    bool m_running = false;                                       ///< 计时器当前是否在运行。
-    bool m_solvedNotified = false;                                ///< 是否已发出通关信号，用于忽略完成后的移动。
-    std::array<int, domain::kDifficultyCount> m_bestRecords{};    ///< 按难度索引的最佳步数；0 表示没有纪录。
+    QTimer* m_timer = nullptr;     ///< 一秒一跳的计时器，由 Qt 对象树持有。
+    int m_elapsedSeconds = 0;      ///< 本局累计用时（秒）。
+    bool m_running = false;        ///< 计时器当前是否在运行。
+    bool m_solvedNotified = false; ///< 是否已发出通关信号，用于忽略完成后的移动。
+    std::array<int, domain::kDifficultyCount> m_bestRecords{}; ///< 按难度索引的最佳步数；0 表示没有纪录。
 };
 
 } // namespace model

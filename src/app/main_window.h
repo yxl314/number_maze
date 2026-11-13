@@ -76,8 +76,8 @@ class MainWindow : public QMainWindow
     model::GameModel* m_model = nullptr;                ///< 游戏模型，由 Qt 对象树持有。
     controller::GameController* m_controller = nullptr; ///< 控制器；析构时先于其协作者手动释放。
 
-    std::unique_ptr<view::DifficultyCatalog> m_catalog;       ///< 难度名称表，供菜单与控制器生成文本。
-    std::unique_ptr<view::StatusBarView> m_statusView;        ///< 状态栏输出端口的实现。
+    std::unique_ptr<view::DifficultyCatalog> m_catalog; ///< 难度名称表，供菜单与控制器生成文本。
+    std::unique_ptr<view::StatusBarView> m_statusView;  ///< 状态栏输出端口的实现。
     std::unique_ptr<view::MessageBoxSolvedSink> m_solvedSink; ///< 通关结果输出端口的实现。
     std::unique_ptr<service::RecordStore> m_records;          ///< 基于 @c QSettings 的最佳成绩存储。
 

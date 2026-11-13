@@ -146,7 +146,7 @@ class GameState
     std::array<int, g_node_count> m_board{}; ///< 每个节点的取值；0 表示空格。
     std::vector<int> m_history;              ///< 悔棋历史；每项记录一次移动前的空格下标。
     int m_moveCount = 0;                     ///< 上一次打乱或恢复以来的玩家步数。
-    Random* m_random = nullptr;              ///< 注入的随机源；为空时使用进程内共享的内置随机源。
+    Random* m_random = nullptr; ///< 注入的随机源；为空时使用进程内共享的内置随机源。
 };
 
 } // namespace domain
