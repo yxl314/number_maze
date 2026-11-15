@@ -67,6 +67,15 @@ NUMBERMAZE_THIRD_PARTY_SOURCES = \
     $$NUMBERMAZE_ROOT/third_party/singleproc/src/singleproc.cpp \
     $$NUMBERMAZE_ROOT/third_party/stacklog/src/stacklog.cpp
 
+# 平台实现二选一：singleproc 0.3.0 起把 flock/Unix socket 与
+# LockFileEx/命名管道拆成两个平台文件，由 qmake 作用域选择，避免把
+# POSIX 的 poll.h 带进 Windows 构建。
+unix: NUMBERMAZE_THIRD_PARTY_SOURCES += \
+    $$NUMBERMAZE_ROOT/third_party/singleproc/src/platform_posix.cpp
+
+win32: NUMBERMAZE_THIRD_PARTY_SOURCES += \
+    $$NUMBERMAZE_ROOT/third_party/singleproc/src/platform_win32.cpp
+
 INCLUDEPATH += \
     $$NUMBERMAZE_ROOT/src \
     $$NUMBERMAZE_ROOT/third_party/singleproc/include \
