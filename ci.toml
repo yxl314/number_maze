@@ -22,5 +22,6 @@ framework = "custom"
 commands = [["python3", "tests/run_all.py"]]
 
 [test.env]
-QMAKE = "qmake5"
+# qmake 由 tests/run_all.py 按平台选（Linux qmake5 / Windows qmake-qt5），
+# 这里不再写死，配置在两个平台上保持一致。
 QT_QPA_PLATFORM = "offscreen"

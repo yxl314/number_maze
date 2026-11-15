@@ -9,8 +9,8 @@
     python3 tests/run_all.py            # 全部
     python3 tests/run_all.py model      # 只跑名字含 model 的
 
-环境变量：``QMAKE``（默认 qmake5）、``MAKE``（默认按平台选）、``JOBS``
-（默认 4）。
+环境变量：``QMAKE``（默认按平台：Linux qmake5 / Windows qmake-qt5）、
+``MAKE``（默认按平台选）、``JOBS``（默认 4）。
 
 退出码：0 全部通过；1 有构建/运行失败；2 没有测试匹配过滤条件。
 """
@@ -39,6 +39,16 @@ def default_make():
         if shutil.which(name) is not None:
             return name
     return candidates[0]
+
+
+def default_qmake():
+    """返回本平台默认的 qmake 命令名。
+
+    Returns:
+        str: 本机 Qt5 的 qmake；Linux 上是包装脚本 qmake5，Windows 上叫
+        qmake-qt5（MSYS2 的 Qt5 包）。
+    """
+    return "qmake-qt5" if os.name == "nt" else "qmake5"
 
 
 def executable_suffix():
@@ -130,7 +140,7 @@ def main(argv):
     here = os.path.dirname(os.path.abspath(__file__))
     root = os.path.dirname(here)
     out_dir = os.path.join(root, "build", "tests")
-    qmake = os.environ.get("QMAKE") or "qmake5"
+    qmake = os.environ.get("QMAKE") or default_qmake()
     make = os.environ.get("MAKE") or default_make()
     jobs = os.environ.get("JOBS") or "4"
     filter_text = argv[1] if len(argv) > 1 else ""
