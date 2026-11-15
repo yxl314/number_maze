@@ -1,47 +1,6 @@
 #!/bin/sh
-# 构建并运行全部测试 —— 每个测试是独立 qmake 工程。
-#
-#     ./tests/run_all.sh            # 全部
-#     ./tests/run_all.sh model      # 只跑名字含 model 的
-#
-# 产物放在 build/tests/；缺省 4 路并行，可用 JOBS 覆盖。
+# 兼容入口：真正的跨平台实现在 run_all.py（Windows 上没有 sh 也能用
+# `python3 tests/run_all.py`）。参数与环境变量语义见 run_all.py。
 set -u
-
-HERE=$(cd "$(dirname "$0")" && pwd)
-ROOT=$(cd "$HERE/.." && pwd)
-QMAKE=${QMAKE:-qmake5}
-JOBS=${JOBS:-4}
-FILTER=${1:-}
-OUT="$ROOT/build/tests"
-STATUS=0
-MATCHED=0
-
-export QT_QPA_PLATFORM=offscreen
-
-for pro in "$HERE"/*_tests.pro; do
-    name=$(basename "$pro" .pro)
-    case "$name" in
-        *"$FILTER"*) ;;
-        *) continue ;;
-    esac
-    MATCHED=$((MATCHED + 1))
-    dir="$OUT/$name"
-    printf '=== %s ===\n' "$name"
-    mkdir -p "$dir" || exit 1
-    if ! (cd "$dir" && "$QMAKE" "$pro" && make -j"$JOBS"); then
-        printf '构建失败: %s\n' "$name"
-        STATUS=1
-        continue
-    fi
-    if ! "$dir/bin/$name"; then
-        printf '测试失败: %s\n' "$name"
-        STATUS=1
-    fi
-done
-
-if [ "$MATCHED" -eq 0 ]; then
-    printf '没有测试匹配过滤条件: %s\n' "${FILTER:-<无>}" >&2
-    exit 2
-fi
-
-exit $STATUS
+DIR=$(cd "$(dirname "$0")" && pwd)
+exec python3 "$DIR/run_all.py" "$@"
