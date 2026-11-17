@@ -58,23 +58,38 @@ NUMBERMAZE_MAIN_SOURCES = \
     $$NUMBERMAZE_ROOT/src/app/main.cpp
 
 # 第三方源码保持独立；域层和测试不依赖它们。
+# 两个库都采用“平台无关核心 + 内部平台端口”结构：公共源固定，平台适配器按
+# qmake 目标平台接入（与源库 CMake 的 WIN32/POSIX 选择保持一致）。singleproc
+# 0.3.0 起把 flock/Unix socket 与 LockFileEx/命名管道拆成两个平台文件，避免把
+# POSIX 的 poll.h 带进 Windows 构建。
 NUMBERMAZE_THIRD_PARTY_HEADERS = \
     $$NUMBERMAZE_ROOT/third_party/singleproc/include/singleproc/singleproc.hpp \
+    $$NUMBERMAZE_ROOT/third_party/singleproc/src/platform.hpp \
     $$NUMBERMAZE_ROOT/third_party/stacklog/include/stacklog/stacklog.hpp \
-    $$NUMBERMAZE_ROOT/third_party/stacklog/include/stacklog/version.hpp
+    $$NUMBERMAZE_ROOT/third_party/stacklog/include/stacklog/version.hpp \
+    $$NUMBERMAZE_ROOT/third_party/stacklog/src/platform.hpp \
+    $$NUMBERMAZE_ROOT/third_party/stacklog/src/platform_dirs.hpp \
+    $$NUMBERMAZE_ROOT/third_party/stacklog/src/platform_paths.hpp \
+    $$NUMBERMAZE_ROOT/third_party/stacklog/src/platform_stream.hpp \
+    $$NUMBERMAZE_ROOT/third_party/stacklog/src/platform_time.hpp
 
 NUMBERMAZE_THIRD_PARTY_SOURCES = \
     $$NUMBERMAZE_ROOT/third_party/singleproc/src/singleproc.cpp \
     $$NUMBERMAZE_ROOT/third_party/stacklog/src/stacklog.cpp
 
-# 平台实现二选一：singleproc 0.3.0 起把 flock/Unix socket 与
-# LockFileEx/命名管道拆成两个平台文件，由 qmake 作用域选择，避免把
-# POSIX 的 poll.h 带进 Windows 构建。
-unix: NUMBERMAZE_THIRD_PARTY_SOURCES += \
-    $$NUMBERMAZE_ROOT/third_party/singleproc/src/platform_posix.cpp
+unix {
+    NUMBERMAZE_THIRD_PARTY_SOURCES += \
+        $$NUMBERMAZE_ROOT/third_party/singleproc/src/platform_posix.cpp \
+        $$NUMBERMAZE_ROOT/third_party/stacklog/src/platform_posix.cpp
+}
 
-win32: NUMBERMAZE_THIRD_PARTY_SOURCES += \
-    $$NUMBERMAZE_ROOT/third_party/singleproc/src/platform_win32.cpp
+win32 {
+    NUMBERMAZE_THIRD_PARTY_SOURCES += \
+        $$NUMBERMAZE_ROOT/third_party/singleproc/src/platform_win32.cpp \
+        $$NUMBERMAZE_ROOT/third_party/stacklog/src/platform_win32.cpp
+    # singleproc 的 Windows 门铃用命名事件/安全描述符，需要 advapi32。
+    LIBS += -ladvapi32
+}
 
 INCLUDEPATH += \
     $$NUMBERMAZE_ROOT/src \

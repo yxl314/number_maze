@@ -6,10 +6,11 @@
 # 测试是独立 qmake 工程，不在主工程的 compile_commands.json 中；格式检查
 # 覆盖 src 与 tests，测试的构建和运行由 cxx_ci 负责。
 #
-# 在仓库根目录运行：
-#     python3 ../cxx_ci/standardize/standardize.py --check
-#     python3 ../cxx_ci/standardize/standardize.py
-#     python3 ../cxx_ci/standardize/standardize.py --apply
+# 在仓库根目录运行（cxx_ci 统一入口）：
+#     python3 ../cxx_ci/check.py style --root .
+#     ./check.sh style
+# 修复格式/排版时使用 cxx_ci.standardize_tool（先 stage 再 --apply），
+# 不再直接调用旧路径 standardize/standardize.py。
 [standardize]
 paths = ["src", "tests"]
 exclude = ["build", "third_party", "dist"]

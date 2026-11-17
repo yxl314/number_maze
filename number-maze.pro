@@ -58,3 +58,9 @@ DESTDIR     = $$OUT_PWD/bin
 OBJECTS_DIR = $$OUT_PWD/obj
 MOC_DIR     = $$OUT_PWD/moc
 RCC_DIR     = $$OUT_PWD/rcc
+
+# 两个内嵌库的 src/ 下都有同名平台文件（platform.hpp、platform_posix.cpp 等）；
+# qmake 默认按 basename 展平对象名会让后编译的库覆盖前一个库的对象。仅主程序
+# 链接第三方源，因此只在主工程镜像源码目录（对象路径形如 obj/third_party/...，
+# 不引入绝对路径）。测试工程不链接第三方源，保持 qmake 默认对象布局。
+CONFIG += object_parallel_to_source

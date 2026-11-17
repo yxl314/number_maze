@@ -1,3 +1,6 @@
+# cxx_ci 配置 —— number-maze
+# 入口：./check.sh ci 或 python3 ../cxx_ci/check.py ci --root .
+
 name = "number-maze"
 build_system = "qmake"
 source_dir = "."
