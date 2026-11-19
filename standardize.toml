@@ -9,8 +9,7 @@
 # 在仓库根目录运行（cxx_ci 统一入口）：
 #     python3 ../cxx_ci/check.py style --root .
 #     ./check.sh style
-# 修复格式/排版时使用 cxx_ci.standardize_tool（先 stage 再 --apply），
-# 不再直接调用旧路径 standardize/standardize.py。
+# 修复格式/排版时使用 cxx_ci.standardize_tool（先 stage 再 --apply）。
 [standardize]
 paths = ["src", "tests"]
 exclude = ["build", "third_party", "dist"]
