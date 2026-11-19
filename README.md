@@ -96,7 +96,10 @@ Qt 5.5 的 qmake 不支持 `CONFIG += c++14`，`number-maze.pri` 直接指定
 ### cxx_ci
 
 ```bash
-python3 ../cxx_ci/ci/ci.py ci.toml
+python3 ../cxx_ci/check.py ci --root .      # 流水线：clean → configure → build → test
+python3 ../cxx_ci/check.py style --root .   # 格式门禁
+# 只校验配置与工具，不执行构建
+PYTHONPATH=../cxx_ci/src python3 -m cxx_ci.ci_tool -c ci.toml --check-config
 ```
 
 流水线执行 clean → configure → build → 5 个测试工程；并行度由 `--jobs`
@@ -146,30 +149,34 @@ selftest 用负向 fixture 证明门禁会失败。
 主工程的 `compile_commands.json` 中，由 `cxx_ci` 负责构建和运行。
 当前 clang-tidy 14~21 无法解析 Qt 5.6.3 头文件，`standardize.toml` 与
 `audit.toml` 暂关 tidy，`format` 门禁保持开启；Qt 6 迁移或换用兼容
-clang-tidy 后恢复。
+clang-tidy 后恢复。新版 cxx_audit 的 tidy 检查集由 `audit.toml` 的
+`[tidy.groups]` 生成，不再读取项目根目录的 `.clang-tidy`。
 
 ## 打包（cxx_pkg）
 
-打包配置在 `cxx_pkg.ini`，由 cxx_pkg 完成构建、运行时依赖收集、Qt 插件部署、
-RPATH 改写和包输出：
+打包配置在 `cxx_pkg.toml`（TOML），由 cxx_pkg 完成构建、运行时依赖收集、
+Qt 插件部署、RPATH 改写和包输出：
 
 ```bash
-python3 ../cxx_pkg/cxx_pkg.py --config cxx_pkg.ini
+# 未安装时从源码 clone 运行；安装后用等价的 cxx-pkg 控制台入口
+PYTHONPATH=../cxx_pkg/src python3 -m cxx_pkg -c cxx_pkg.toml
+# 只校验配置与工具：
+PYTHONPATH=../cxx_pkg/src python3 -m cxx_pkg -c cxx_pkg.toml --check-config
 # 产物：dist/number-maze-2.0.0-x86_64.tar.gz
 #       dist/number-maze-2.0.0-x86_64.run
 ```
 
 本地 Qt 5 的路径由配置显式指定：
 
-```ini
+```toml
 [build]
-qmake = qmake5
-make_args = -j4
+qmake = "qmake5"
+make_args = "-j4"
 
 [qt]
 enabled = true
 # 必须与 `qmake5 -query QT_INSTALL_PREFIX` 一致；换构建机时同步修改。
-prefix = /opt/qt-5.6.3
+prefix = "/opt/qt-5.6.3"
 ```
 
 包内会自动带上：
@@ -187,7 +194,7 @@ DESTDIR=/tmp/number-maze-root ./dist/number-maze-2.0.0-x86_64.run
 ```
 
 **兼容性基线**：包内的 glibc 基线由构建机决定。要在 Ubuntu 16.04 上运行，
-应在 16.04（Qt 5.5.1）环境执行同一份 `cxx_pkg.ini` 完成构建与打包；
+应在 16.04（Qt 5.5.1）环境执行同一份 `cxx_pkg.toml` 完成构建与打包；
 在较新 Ubuntu 上构建的二进制不能保证回退到 16.04。
 
 `.run` 是 cxx_pkg 生成的自解压脚本，支持 `DESTDIR` 安装；
@@ -205,9 +212,10 @@ DESTDIR=/tmp/number-maze-root ./dist/number-maze-2.0.0-x86_64.run
 
 ## 单实例与日志
 
-`main.cpp` 使用嵌入式 singleproc 库保证同一用户只运行一个实例；当前
-应用暂未接入门铃，重复启动会直接退出。日志由
-stacklog 写入 `$XDG_STATE_HOME/number-maze/number-maze.log`
+`main.cpp` 使用嵌入式 singleproc 0.3.0（`singleproc::guard` /
+`singleproc::guard::status`）保证同一用户只运行一个实例；当前应用暂未
+接入门铃，重复启动会直接退出。日志由 stacklog 0.2.0 写入
+`$XDG_STATE_HOME/number-maze/number-maze.log`
 （未设该变量时为 `~/.local/state/number-maze/number-maze.log`），
 文件按 2 MiB × 3 份轮转。
 
@@ -231,5 +239,5 @@ third_party/stacklog/       内嵌库：调用链日志
 resources/                  内置字体子集、图标与 qrc
 audit.toml                  cxx_audit 配置
 ci.toml                     cxx_ci 配置
-cxx_pkg.ini                 cxx_pkg 打包配置
+cxx_pkg.toml                cxx_pkg 打包配置（TOML）
 ```

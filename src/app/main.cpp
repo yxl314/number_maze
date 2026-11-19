@@ -136,8 +136,8 @@ int main(int argc, char* argv[])
         }
         STACKLOG_INFO() << "数字迷宫启动";
 
-        singleproc::Guard guard(g_instance_name);
-        if (guard.state() == singleproc::Guard::State::Error)
+        singleproc::guard guard(g_instance_name);
+        if (guard.state() == singleproc::guard::status::error)
         {
             STACKLOG_ERROR() << "单实例锁失败 errno=" << guard.error_code();
             exitCode = 1;

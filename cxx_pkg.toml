@@ -1,0 +1,31 @@
+# cxx_pkg 打包配置 —— number-maze
+#
+# 用法（仓库根目录，源码 clone 未安装时）：
+#     PYTHONPATH=../cxx_pkg/src python3 -m cxx_pkg -c cxx_pkg.toml
+#     PYTHONPATH=../cxx_pkg/src python3 -m cxx_pkg -c cxx_pkg.toml --check-config
+# 安装后可直接用控制台入口：cxx-pkg -c cxx_pkg.toml
+
+[project]
+name = "number-maze"
+version = "2.0.0"
+
+[build]
+system = "qmake"
+source = "."
+build_dir = "build/pkg"
+project_file = "number-maze.pro"
+target = "number-maze"
+qmake = "qmake5"
+make_args = "-j4"
+
+[package]
+formats = ["tar.gz", "run"]
+install_dir = "/opt/number-maze"
+out_dir = "dist"
+maintainer = "unknown"
+description = "Number Maze, a number sliding puzzle on a graph topology"
+
+[qt]
+enabled = true
+# 本机 Qt 5.6 安装前缀；换构建机时改成对应 Qt 前缀。
+prefix = "/opt/qt-5.6.3"

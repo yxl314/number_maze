@@ -33,9 +33,12 @@
 ## 复核命令
 
 ```bash
-python3 ../cxx_ci/ci/ci.py ci.toml
-python3 ../cxx_pkg/cxx_pkg.py --config cxx_pkg.ini --format tar.gz
-PYTHONPATH=../cxx_audit/src python3 -m cpp_audit -c audit.toml all
+python3 ../cxx_ci/check.py ci --root .
+PYTHONPATH=../cxx_pkg/src python3 -m cxx_pkg -c cxx_pkg.toml --format tar.gz
+PYTHONPATH=../cxx_audit/src python3 -m cxx_audit -c audit.toml all
+# 只校验配置（不构建、不写报告）
+PYTHONPATH=../cxx_audit/src python3 -m cxx_audit -c audit.toml --check-config
+PYTHONPATH=../cxx_pkg/src python3 -m cxx_pkg -c cxx_pkg.toml --check-config
 python3 tools/check_layering.py .
 python3 tools/layering_selftest.py .
 ```

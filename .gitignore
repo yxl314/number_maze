@@ -52,6 +52,9 @@ dist/
 packaging/stage/
 *.run
 
+# cxx_pkg 构建暂存目录
+.cxx_pkg-work/
+
 # 模型测试构建目录
 build-model/
 

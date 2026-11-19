@@ -1,7 +1,9 @@
-# cxx_audit 配置 —— number-maze
+# cxx_audit（cxx-audit）配置 —— number-maze
 #
-# 用法（仓库根目录）：
-#     PYTHONPATH=../cxx_audit/src python3 -m cpp_audit -c audit.toml all
+# 用法（仓库根目录，源码 clone 未安装时）：
+#     PYTHONPATH=../cxx_audit/src python3 -m cxx_audit -c audit.toml all
+#     PYTHONPATH=../cxx_audit/src python3 -m cxx_audit -c audit.toml --check-config
+# 安装后可直接用控制台入口：cxx-audit -c audit.toml all
 
 [project]
 name = "number-maze"
@@ -22,8 +24,15 @@ rules = []
 [tidy]
 # 安装的 clang-tidy 14~21 无法解析 Qt 5.6.3 头文件；Qt 6 迁移后恢复。
 enabled = false
-# clang-tidy 检查集由项目根目录 .clang-tidy 提供。
 fail_on_warnings = true
+
+[tidy.groups]
+# 新版 cxx_audit 不读取项目 .clang-tidy，检查集由组开关生成。
+# 当前 tidy 关闭（Qt 5.6 头文件无法解析），恢复时按需打开；未列出的组默认关闭。
+null_pointer = true
+uninitialized = true
+memory = true
+common_bugs = true
 
 [cpd]
 enabled = true
