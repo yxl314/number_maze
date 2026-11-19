@@ -24,10 +24,10 @@
 #include <cstddef>
 #include <cstring>
 #include <new>
-#include <sddl.h>
 #include <string>
 #include <vector>
 #include <windows.h>
+#include <sddl.h>
 
 namespace singleproc
 {
